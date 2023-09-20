@@ -11,6 +11,7 @@ export const translate = {
             'title-modal-addreport': 'Thêm báo cáo',
             'sidebar-report': 'Báo cáo hàng hóa',
             'goods': 'Hàng hóa',
+            'model': 'Quản lý Model',
         }
     },
     en: {
@@ -25,6 +26,7 @@ export const translate = {
             'title-modal-addreport': 'Add new report',
             'sidebar-report': 'Goods report',
             'goods': 'Goods',
+            'model': 'Quản lý Model',
         }
     },
     ko: {
@@ -39,6 +41,7 @@ export const translate = {
             'title-modal-addreport': '신상품 신고 추가',
             'sidebar-report': '물품보고',
             'goods': '상품',
+            'model': 'Quản lý Model',
         }
     }
 };

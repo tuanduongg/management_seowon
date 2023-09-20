@@ -3,7 +3,8 @@ export const ConfigRouter = {
   logout: '/logout',
   signin: '/signin',
   notfound: '/404',
-  signup:'/signup',
+  signup: '/signup',
+  model: '/model',
 
   home: '/',
 };

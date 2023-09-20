@@ -2,18 +2,15 @@ import { ConfigRouter } from "ConfigRouter";
 
 export const navigations = [
   { label: 'goods', type: 'label' },
-  { name: 'sidebar-report', path: ConfigRouter.home, icon: 'assessment' },
-  { label: 'PAGES', type: 'label' },
-  // {
-  //   name: 'Authentication',
-  //   icon: 'security',
-  //   children: [
-  //     { name: 'Sign in', iconText: 'SI', path: ConfigRouter.login },
-  //     { name: 'Sign up', iconText: 'SU', path: ConfigRouter.signup },
-  //     { name: 'Forgot Password', iconText: 'FP', path: '/session/forgot-password' },
-  //     { name: 'Error', iconText: '404', path: ConfigRouter.notfound },
-  //   ],
-  // },
+
+  {
+    name: 'Quản lý hàng hóa',
+    icon: 'assessment',
+    children: [
+      { name: 'sidebar-report', path: ConfigRouter.home, icon: 'assessment' },
+      { name: 'model', icon: 'circle', path: ConfigRouter.signup },
+    ],
+  },
   // { label: 'Components', type: 'label' },
   // {
   //   name: 'Components',
@@ -41,6 +38,7 @@ export const navigations = [
   //   icon: 'trending_up',
   //   children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
   // },
+  { label: 'PAGES', type: 'label' },
   {
     name: 'Documentation',
     icon: 'launch',

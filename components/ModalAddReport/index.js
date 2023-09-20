@@ -315,7 +315,7 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                         <FormControl sx={{ m: 1 }} variant="standard">
                             <InputLabel id="demo-controlled-open-select-label">Time</InputLabel>
                             <Select
-                                placeholder="Nhập Time làm..."
+                                placeholder="Nhập Time làm việc..."
                                 value={time}
                                 label="Time"
                                 onChange={(e) => { setTime(e.target.value) }}
