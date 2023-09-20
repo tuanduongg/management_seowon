@@ -1,4 +1,4 @@
-import { Avatar, Hidden, Icon, IconButton, MenuItem, useMediaQuery,Tooltip } from '@mui/material';
+import { Avatar, Hidden, Icon, IconButton, MenuItem, useMediaQuery, Tooltip } from '@mui/material';
 import { Box, styled, useTheme } from '@mui/system';
 import { MatxMenu, MatxSearchBox, MultipleSelect } from 'components';
 import { themeShadows } from 'components/MatxTheme/themeColors';
@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { Span } from '../../../components/Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
 import ShoppingCart from '../../ShoppingCart';
+import { deepOrange, deepPurple } from '@mui/material/colors';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -70,6 +71,10 @@ const IconBox = styled('div')(({ theme }) => ({
   [theme.breakpoints.down('md')]: { display: 'none !important' },
 }));
 
+
+const getFirstUsername = (username) => {
+  return username[0] ?? 'User';
+}
 const Layout1Topbar = () => {
   const theme = useTheme();
   const { settings, updateSettings } = useSettings();
@@ -97,7 +102,7 @@ const Layout1Topbar = () => {
     <TopbarRoot>
       <TopbarContainer>
         <Box display="flex">
-          <MultipleSelect/>
+          <MultipleSelect />
           {/* <StyledIconButton onClick={handleSidebarToggle}>
               <Tooltip title="Đóng/mở menu">
                 <Icon>menu</Icon>
@@ -130,36 +135,30 @@ const Layout1Topbar = () => {
             menuButton={
               <UserMenu>
                 <Hidden xsDown>
-                  <Span>
-                    Hi <strong>{user.name}</strong>
+                  <Icon> person </Icon>
+                  <Span><strong>{user.name}</strong>
                   </Span>
                 </Hidden>
-                <Avatar src={user.avatar} sx={{ cursor: 'pointer' }} />
               </UserMenu>
             }
           >
             <StyledItem>
               <Link to="/">
-                <Icon> home </Icon>
-                <Span> Home </Span>
+                <Icon> home</Icon>
+                <Span> Trang chủ </Span>
               </Link>
             </StyledItem>
 
             <StyledItem>
               <Link to="/page-layouts/user-profile">
                 <Icon> person </Icon>
-                <Span> Profile </Span>
+                <Span> Trang cá nhân </Span>
               </Link>
-            </StyledItem>
-
-            <StyledItem>
-              <Icon> settings </Icon>
-              <Span> Settings </Span>
             </StyledItem>
 
             <StyledItem onClick={logout}>
               <Icon> power_settings_new </Icon>
-              <Span> Logout </Span>
+              <Span> Đăng xuất </Span>
             </StyledItem>
           </MatxMenu>
         </Box>

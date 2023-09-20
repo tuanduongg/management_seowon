@@ -4,6 +4,7 @@ import React, { Fragment } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Paragraph, Span } from '../Typography';
 import MatxVerticalNavExpansionPanel from './MatxVerticalNavExpansionPanel';
+import { useTranslation } from 'react-i18next';
 
 const ListLabel = styled(Paragraph)(({ theme, mode }) => ({
   fontSize: '12px',
@@ -74,6 +75,8 @@ const BadgeValue = styled('div')(() => ({
 }));
 
 const MatxVerticalNav = ({ items }) => {
+  const { t, i18n } = useTranslation();
+
   const { settings } = useSettings();
   const { mode } = settings.layout1Settings.leftSidebar;
 
@@ -82,7 +85,7 @@ const MatxVerticalNav = ({ items }) => {
       if (item.type === 'label')
         return (
           <ListLabel key={index} mode={mode} className="sidenavHoverShow">
-            {item.label}
+            {t(item.label)}
           </ListLabel>
         );
 
@@ -110,7 +113,7 @@ const MatxVerticalNav = ({ items }) => {
                 }
               })()}
               <StyledText mode={mode} className="sidenavHoverShow">
-                {item.name}
+                {t(item.name)}
               </StyledText>
               <Box mx="auto"></Box>
               {item.badge && <BadgeValue>{item.badge.value}</BadgeValue>}
@@ -152,7 +155,7 @@ const MatxVerticalNav = ({ items }) => {
                   </Fragment>
                 )}
                 <StyledText mode={mode} className="sidenavHoverShow">
-                  {item.name}
+                  {t(item.name)}
                 </StyledText>
 
                 <Box mx="auto" />

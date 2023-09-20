@@ -1,5 +1,4 @@
-import { Box, styled,CardMedia } from '@mui/material';
-import { MatxLogo } from 'components';
+import { Box, styled, CardMedia } from '@mui/material';
 import useSettings from 'hooks/useSettings';
 import { Span } from './Typography';
 import Logo from '../assets/images/logo.png';
@@ -25,7 +24,6 @@ const Brand = ({ children }) => {
   return (
     <BrandRoot>
       <Box display="flex" alignItems="center">
-        {/* <MatxLogo /> */}
         <img src={Logo} alt="logo" />
         <StyledSpan mode={mode} className="sidenavHoverShow">
           SEOWONINTECH

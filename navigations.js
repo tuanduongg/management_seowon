@@ -1,8 +1,8 @@
 import { ConfigRouter } from "ConfigRouter";
 
 export const navigations = [
-  { label: 'Hàng hóa', type: 'label' },
-  { name: 'Báo cáo hàng hóa', path: ConfigRouter.home, icon: 'assessment' },
+  { label: 'goods', type: 'label' },
+  { name: 'sidebar-report', path: ConfigRouter.home, icon: 'assessment' },
   { label: 'PAGES', type: 'label' },
   // {
   //   name: 'Authentication',

@@ -26,8 +26,8 @@ Mock.onPost('/api/auth/login').reply(async (config) => {
 
     const { username } = JSON.parse(config.data);
     const user = userList.find((u) => u.username === username);
-
     if (!user) {
+      console.log('user', user);
       return [400, { message: 'Invalid email or password' }];
     }
     const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, {

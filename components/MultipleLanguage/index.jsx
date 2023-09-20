@@ -1,16 +1,23 @@
 import { Select, MenuItem } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next'
+
 
 const DEFAULT = [
     { title: 'Việt Nam', code: 'vn' },
-    { title: 'Korean', code: 'kr' },
+    { title: 'Korean', code: 'ko' },
+    { title: 'English', code: 'en' },
 ];
 
 const MultipleSelect = () => {
 
-    const [language, setLanguage] = useState('vn');
+    const { t, i18n } = useTranslation();
+
+    const [language, setLanguage] = useState(i18n.language);
     const handleChange = (e) => {
         setLanguage(e?.target?.value);
+        i18n.changeLanguage(e?.target?.value);
+        localStorage.setItem('LANGUAGE', e?.target?.value);
     }
     return (
         <>
