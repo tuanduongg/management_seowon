@@ -4,8 +4,8 @@ import { Box, styled, useTheme } from '@mui/system';
 import { Paragraph } from 'components/Typography';
 import useAuth from 'hooks/useAuth';
 import { Formik } from 'formik';
-import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Navigate as NavigateTo, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import Logo from '../../assets/images/logo.png';
 import { ConfigRouter } from 'ConfigRouter';
@@ -46,7 +46,15 @@ const initialValues = {
 // form field validation schema
 
 const JwtLogin = () => {
+
+  const [messageErr, setMessageErr] = useState('');
   const theme = useTheme();
+
+
+  let {
+    isAuthenticated,
+    // user
+  } = useAuth();
 
   const { t, i18n } = useTranslation();
 
@@ -59,20 +67,31 @@ const JwtLogin = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(ConfigRouter.home);
+    }
+  }, []);
+
+
   const { login } = useAuth();
 
   const handleFormSubmit = async (values) => {
+    setMessageErr('');
     setLoading(true);
     try {
-      const data = await login(values.username, values.username);
-      console.log('data', data);
+      const data = await login(values.username, values.password);
       navigate(ConfigRouter.home);
     } catch (e) {
+      setMessageErr('Invalid Username or Password!');
       setLoading(false);
     }
   };
-
+  if (isAuthenticated) {
+    return <NavigateTo to={ConfigRouter.home} />
+  }
   return (
+
     <JWTRoot>
       <Card className="card">
         <Grid container>
@@ -122,26 +141,9 @@ const JwtLogin = () => {
                       sx={{ mb: 1.5 }}
                     />
 
-                    {/* <FlexBox justifyContent="space-between">
-                      <FlexBox gap={1}>
-                        <Checkbox
-                          size="small"
-                          name="remember"
-                          onChange={handleChange}
-                          checked={values.remember}
-                          sx={{ padding: 0 }}
-                        />
-
-                        <Paragraph>Remember Me</Paragraph>
-                      </FlexBox>
-
-                      <NavLink
-                        to="/session/forgot-password"
-                        style={{ color: theme.palette.primary.main }}
-                      >
-                        Forgot password?
-                      </NavLink>
-                    </FlexBox> */}
+                    <FlexBox justifyContent="space-between">
+                      <Typography sx={{ color: 'red' }}>{messageErr}</Typography>
+                    </FlexBox>
 
                     <LoadingButton
                       type="submit"

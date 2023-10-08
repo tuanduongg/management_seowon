@@ -49,7 +49,7 @@ const Sidenav = ({ children }) => {
         <MatxVerticalNav items={navigations} />
       </StyledScrollBar>
 
-      <SideNavMobile onClick={() => updateSidebarMode({ mode: 'close' })} />
+      {/* <SideNavMobile onClick={() => updateSidebarMode({ mode: 'close' })} /> */}
     </Fragment>
   );
 };

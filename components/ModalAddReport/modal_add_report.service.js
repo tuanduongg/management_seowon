@@ -42,8 +42,8 @@ export const checkShift = () => {
 
 export const getPercentNG = (sum, totalNG) => {
     if (sum && totalNG) {
-
-        return (totalNG / sum) * 100;
+        const res = (totalNG / sum) * 100;
+        return res.toFixed(2);
     }
     return 0;
 }

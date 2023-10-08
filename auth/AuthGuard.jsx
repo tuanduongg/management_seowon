@@ -22,11 +22,6 @@ const AuthGuard = ({ children }) => {
   } = useAuth();
   const { pathname } = useLocation();
 
-  //   const routes = flat(AllPages);
-
-  //   const hasPermission = userHasPermission(pathname, user, routes);
-  //   let authenticated = isAuthenticated && hasPermission;
-
   // // IF YOU NEED ROLE BASED AUTHENTICATION,
   // // UNCOMMENT ABOVE LINES
   // // AND COMMENT OUT BELOW authenticated VARIABLE

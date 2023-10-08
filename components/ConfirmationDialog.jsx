@@ -1,4 +1,5 @@
-import { Button, Dialog, styled } from '@mui/material';
+import { Box, Button, Dialog, Typography, styled } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
 
 const DialogBox = styled('div')(() => ({
   width: 360,
@@ -8,7 +9,7 @@ const DialogBox = styled('div')(() => ({
   marginRight: 'auto',
 }));
 
-const Title = styled('h4')(() => ({
+const Title = styled('h2')(() => ({
   margin: 0,
   marginBottom: '8px',
   textTransform: 'capitalize',
@@ -50,7 +51,7 @@ const ConfirmationDialog = ({
   open,
   onConfirmDialogClose,
   text,
-  title = 'confirm',
+  title = 'Thông báo',
   onYesClick,
 }) => {
   return (

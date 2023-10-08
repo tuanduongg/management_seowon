@@ -1,11 +1,16 @@
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Modal, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close'
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCurrentWeek, checkShift, getPercentNG, isPositiveInteger } from "./modal_add_report.service";
 import ModalAddModel from "components/ModalAddModel";
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import style from './modal_add_report.module.css';
+import QuillEditor from "components/QuillEditor";
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const CustomModal = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -29,6 +34,11 @@ const SHIFT = [
         name: 'B(Đêm)'
     }
 ];
+
+const ARRYEAR = Array.from({ length: 19 }, (_, i) => new Date().getFullYear() - i);;
+// for (let index = new Date().getFullYear(); index <= 2010; index--) {
+//     ARRYEAR.push(index);
+// }
 
 const DAY = [];
 const DEPARTMENT = [
@@ -103,9 +113,22 @@ const COLORS = [
     { 'color_code': '3', 'label': 'Lavender' },
     { 'color_code': '4', 'label': 'Beige' },
 ];
+const ListNG = [
+    // { 'id': '1', 'name': 'Loang mực', totalNG: 160 },
+    // { 'id': '2', 'name': 'Bẩn mực', totalNG: 150 },
+    // { 'id': '3', 'name': 'Tràn mực', totalNG: 140 },
+    // { 'id': '4', 'name': 'Vết đâm lõm', totalNG: 130 },
+];
 const initValidate = {
     error: false,
     msg: ''
+}
+
+const inititalNG = {
+    nameNG: '',
+    numNG: '',
+    error: false,
+    helperText: ''
 }
 
 
@@ -145,6 +168,16 @@ const ModalAddReport = ({ open, onCloseModal }) => {
 
     const [percent, setPercent] = useState(0);
     const [note, setNote] = useState('');
+
+    const [listNG, setListNG] = useState(ListNG);
+    const [nameNG, setNameNG] = useState('');
+    const [validateNameNG, setValidateNameNG] = useState(initValidate);
+    const [numNG, setNumNG] = useState('');
+    const [validateNumNG, setValidateNumNG] = useState(initValidate);
+
+    const [scroll, setScroll] = useState('paper');
+
+    const contentRef = useRef(null);
 
 
 
@@ -271,9 +304,48 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                 break;
         }
     }
+    const handleClearRowNG = (index) => {
+
+        const data = [...listNG];
+        data.splice(index, 1);
+        setListNG(data);
+    }
+
+    const handleClickSave = () => {
+        alert('saving');
+    }
+
+
+    const hanldeAddInputNG = () => {
+        if (nameNG?.trim().length < 1) {
+            setValidateNameNG({ error: true, msg: 'Bắt buộc nhập tên lỗi' });
+            return;
+        }
+        if (numNG?.trim().length < 1) {
+            setValidateNumNG({ error: true, msg: 'Bắt buộc nhập số lượng' });
+            return;
+        }
+
+        setListNG([...listNG, { name: nameNG, totalNG: numNG }]);
+
+        // { 'id': '4', 'name': 'Vết đâm lõm', totalNG: 130 },
+    }
+    const hanldeDeleteRowNG = (index) => {
+        let arr = [...listNG];
+        arr.splice(index, 1)
+        setListNG(arr);
+    }
+
+    const getDataMaster = () => {
+        const
+    }
+    useEffect(() => {
+
+    }, []);
 
     return (<>
         <CustomModal
+            scroll={scroll}
             onClose={onCloseModal}
             aria-labelledby="customized-dialog-title"
             open={open}
@@ -293,214 +365,284 @@ const ModalAddReport = ({ open, onCloseModal }) => {
             >
                 <CloseIcon />
             </IconButton>
-            <Box sx={{ minWidth: '800px', padding: '10px', borderTop: '1px solid #d7d7d7' }}>
+            <Box ref={contentRef} sx={{
+                minWidth: '800px', padding: '10px', borderTop: '1px solid #d7d7d7', overflowY: 'auto', overflowX: 'hidden', maxHeight: '100%', '&::-webkit-scrollbar': {
+                    width: '2px',
+                }, '&::-webkit-scrollbar-thumb': {
+                    background: 'rgba(52, 49, 76, 1)',
+                }
+            }}>
                 <Typography variant="p" component={'p'} fontWeight={'bold'}>Thời gian</Typography>
-                <Grid sx={{ margin: '10px 0px' }} container>
-                    <Grid item xs={2}>
-                        <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
-                            <InputLabel id="demo-controlled-open-select-label">Ca</InputLabel>
-                            <Select
-                                placeholder="Nhập ca làm việc..."
-                                value={shift}
-                                label="Ca"
-                                onChange={handleChangeShift}
-                            >
-                                {SHIFT.map((item) =>
-                                    (<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>))}
-                            </Select>
-                        </FormControl>
+                <Box sx={{ border: '1px solid #ddd', padding: '5px' }}>
 
+                    <Grid sx={{ margin: '10px 0px' }} container>
+                        <Grid item xs={2}>
+                            <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
+                                <InputLabel id="demo-controlled-open-select-label">Ca</InputLabel>
+                                <Select
+                                    placeholder="Nhập ca làm việc..."
+                                    value={shift}
+                                    label="Ca"
+                                    onChange={handleChangeShift}
+                                >
+                                    {SHIFT.map((item) =>
+                                        (<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
+                        <Grid item xs={1.5}>
+                            <FormControl sx={{ m: 1 }} variant="standard">
+                                <InputLabel id="demo-controlled-open-select-label">Time</InputLabel>
+                                <Select
+                                    placeholder="Nhập Time làm việc..."
+                                    value={time}
+                                    label="Time"
+                                    onChange={(e) => { setTime(e.target.value) }}
+                                >
+                                    {TIMETEXT.map((item) =>
+                                        (<MenuItem key={item} value={item}>{item}</MenuItem>))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
+                        <Grid item xs={2}>
+                            <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
+                                <InputLabel id="demo-controlled-open-select-label">Tuần</InputLabel>
+                                <Select
+                                    placeholder="Nhập tuần..."
+                                    value={week}
+                                    label="Tuần"
+                                    onChange={(e) => { setWeek(e.target.value) }}
+                                >
+                                    {[...Array(52).keys()].map((item) =>
+                                        (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
+                        <Grid item xs={2}>
+                            <FormControl variant="standard" sx={{ m: 1, minWidth: 100 }}>
+                                <InputLabel id="demo-simple-select-standard-label">Ngày</InputLabel>
+                                <Select
+                                    placeholder="Nhập ngày..."
+                                    value={day}
+                                    label="Ngày"
+                                    onChange={(e) => { setDay(e.target.value) }}
+                                >
+                                    {[...Array(31).keys()].map((item) =>
+                                        (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
+
+                        <Grid item xs={2}>
+                            <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
+                                <InputLabel id="demo-controlled-open-select-label">Tháng</InputLabel>
+                                <Select
+                                    value={month}
+                                    placeholder="Nhập tháng..."
+                                    label="Tháng"
+                                    onChange={(e) => { setMonth(e.target.value) }}
+                                >
+                                    {[...Array(12).keys()].map((item) =>
+                                        (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
+                        <Grid item xs={2}>
+                            <FormControl sx={{ m: 1, minWidth: 120 }} variant="standard">
+                                <InputLabel id="demo-controlled-open-select-label">Năm</InputLabel>
+                                <Select
+                                    value={year}
+                                    label="Năm"
+                                    placeholder="Nhập năm..."
+                                    onChange={(e) => { setYear(e.target.value) }}
+                                >
+                                    {ARRYEAR.map((item, index) =>
+                                        (<MenuItem key={item} value={item}>{item}</MenuItem>))}
+                                </Select>
+                            </FormControl>
+
+                        </Grid>
                     </Grid>
-                    <Grid item xs={1.5}>
-                        <FormControl sx={{ m: 1 }} variant="standard">
-                            <InputLabel id="demo-controlled-open-select-label">Time</InputLabel>
-                            <Select
-                                placeholder="Nhập Time làm việc..."
-                                value={time}
-                                label="Time"
-                                onChange={(e) => { setTime(e.target.value) }}
-                            >
-                                {TIMETEXT.map((item) =>
-                                    (<MenuItem key={item} value={item}>{item}</MenuItem>))}
-                            </Select>
-                        </FormControl>
+                    <Grid sx={{ margin: '10px 0px' }} container>
+                        <Grid item xs={2.4}>
+                            <FormControl error={validateDepart.error} sx={{ m: 1, minWidth: 120 }} variant="standard">
+                                <InputLabel id="demo-controlled-open-select-label">Phòng ban</InputLabel>
+                                <Select
+                                    onBlur={handleBlur}
+                                    name="department"
+                                    value={department}
+                                    label="Phòng ban"
+                                    placeholder="Nhập phòng ban..."
+                                    onChange={handleChangeDepartment}
+                                >
+                                    {DEPARTMENT.map((item, index) =>
+                                        (<MenuItem key={item.department_id} value={item.department_id}>{item.department_name}</MenuItem>))}
+                                </Select>
+                                {validateDepart.error && (<FormHelperText>{validateDepart.msg}</FormHelperText>)}
+                            </FormControl>
 
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField onBlur={handleBlur} name="nameImporter" id="filled-basic" error={validateNameImport.error} helperText={validateNameImport.msg} value={nameImporter} onChange={(e) => {
+                                if (validateNameImport.error) {
+                                    setValidateNameImport(initValidate);
+                                }
+                                setNameImporter(e.target.value)
+                            }} label="Tên người nhập" variant="filled" />
+                        </Grid>
                     </Grid>
-                    <Grid item xs={2}>
-                        <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
-                            <InputLabel id="demo-controlled-open-select-label">Tuần</InputLabel>
-                            <Select
-                                placeholder="Nhập tuần..."
-                                value={week}
-                                label="Tuần"
-                                onChange={(e) => { setWeek(e.target.value) }}
-                            >
-                                {[...Array(52).keys()].map((item) =>
-                                    (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
-                            </Select>
-                        </FormControl>
+                </Box>
 
+                <Typography variant="p" sx={{ margin: '10px 0px' }} component={'p'} fontWeight={'bold'}>Thông tin hàng hóa</Typography>
+                <Box sx={{ border: '1px solid #ddd', padding: '5px' }}>
+
+                    <Grid sx={{ margin: '0px 0px' }} spacing={1} container>
+                        <Grid item xs={3}>
+                            <Autocomplete
+
+                                value={modelCode}
+                                onChange={(event, newValue) => {
+                                    console.log(newValue);
+                                    setModelCode(newValue);
+                                }}
+                                disablePortal
+                                options={MODEL}
+                                renderInput={(params) => <TextField placeholder="Nhập tên model..." variant="standard" {...params} label="Model" />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Autocomplete
+                                value={stage}
+                                onChange={(event, newValue) => {
+                                    setStage(newValue);
+                                }}
+                                disablePortal
+                                options={STAGES}
+                                renderInput={(params) => <TextField placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Autocomplete
+
+                                value={color}
+                                onChange={(event, newValue) => {
+                                    console.log(newValue);
+                                    setColor(newValue);
+                                }}
+                                disablePortal
+                                options={COLORS}
+                                renderInput={(params) => <TextField placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextField placeholder="Nhập thông tin máy..." label="Máy" value={machine} onChange={(e) => { setMachine(e.target.value) }} variant="standard" />
+                        </Grid>
                     </Grid>
-                    <Grid item xs={2}>
-                        <FormControl variant="standard" sx={{ m: 1, minWidth: 100 }}>
-                            <InputLabel id="demo-simple-select-standard-label">Ngày</InputLabel>
-                            <Select
-                                placeholder="Nhập ngày..."
-                                value={day}
-                                label="Ngày"
-                                onChange={(e) => { setDay(e.target.value) }}
-                            >
-                                {[...Array(31).keys()].map((item) =>
-                                    (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
-                            </Select>
-                        </FormControl>
-
+                    <Grid sx={{ margin: '10px 0px' }} spacing={1} container>
+                        <Grid item xs={3}>
+                            <TextField label="Số lượng" error={validateQuantity.error} helperText={validateQuantity.msg} onChange={(e) => {
+                                if (validateQuantity.error) {
+                                    setValidateQuantity(initValidate);
+                                }
+                                setQuantity(e.target.value);
+                            }} type="number" value={quantity} onBlur={handleBlur} name="quantity" placeholder="Nhập tổng số lượng" variant="standard" />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextField error={validateTotalOK.error} helperText={validateTotalOK.msg} label="Tổng số OK" onBlur={handleBlur} name="totalOK" onChange={onChangeTotalOK} type="number" value={totalOK} placeholder="Nhập tổng số OK" variant="standard" />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextField error={validateTotalNG.error} helperText={validateTotalNG.msg} placeholder="Nhập tổng số NG" onBlur={handleBlur} name="totalNG" onChange={onChangeTotalNG} type="number" value={totalNG} label="Tổng số NG" variant="standard" />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextField label="Tỷ lệ(%)" InputProps={{
+                                readOnly: true,
+                            }} value={percent} onChange={(e) => { setMachine(e.target.value); }} variant="standard" />
+                        </Grid>
                     </Grid>
+                </Box>
+                <Typography variant="p" sx={{ margin: '20px 0px 0px 0px' }} component={'p'} fontWeight={'bold'}>Thông tin hàng NG</Typography>
 
-                    <Grid item xs={2}>
-                        <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
-                            <InputLabel id="demo-controlled-open-select-label">Tháng</InputLabel>
-                            <Select
-                                value={month}
-                                placeholder="Nhập tháng..."
-                                label="Tháng"
-                                onChange={(e) => { setMonth(e.target.value) }}
-                            >
-                                {[...Array(12).keys()].map((item) =>
-                                    (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
-                            </Select>
-                        </FormControl>
-
-                    </Grid>
-                    <Grid item xs={2}>
-                        <FormControl sx={{ m: 1, minWidth: 120 }} variant="standard">
-                            <InputLabel id="demo-controlled-open-select-label">Năm</InputLabel>
-                            <Select
-                                value={year}
-                                label="Năm"
-                                placeholder="Nhập năm..."
-                                onChange={(e) => { setYear(e.target.value) }}
-                            >
-                                {[...Array(new Date().getFullYear() - 2004).keys()].map((item, index) =>
-                                    (<MenuItem key={2005 + index} value={2005 + index}>{2005 + index}</MenuItem>))}
-                            </Select>
-                        </FormControl>
-
-                    </Grid>
-                </Grid>
-                <Grid sx={{ margin: '10px 0px' }} container>
-                    <Grid item xs={2.4}>
-                        <FormControl error={validateDepart.error} sx={{ m: 1, minWidth: 120 }} variant="standard">
-                            <InputLabel id="demo-controlled-open-select-label">Phòng ban</InputLabel>
-                            <Select
-                                onBlur={handleBlur}
-                                name="department"
-                                value={department}
-                                label="Phòng ban"
-                                placeholder="Nhập phòng ban..."
-                                onChange={handleChangeDepartment}
-                            >
-                                {DEPARTMENT.map((item, index) =>
-                                    (<MenuItem key={item.department_id} value={item.department_id}>{item.department_name}</MenuItem>))}
-                            </Select>
-                            {validateDepart.error && (<FormHelperText>{validateDepart.msg}</FormHelperText>)}
-                        </FormControl>
-
+                <Grid sx={{ margin: '0px 0px', width: '100%' }} spacing={1} container>
+                    <Grid item xs={6.5}>
+                        <TextField fullWidth value={nameNG} onChange={(e) => { setValidateNameNG(initValidate); setNameNG(e.target.value); }} helperText={validateNameNG.msg} error={validateNameNG.error} placeholder="Nhập nội dung lỗi..." label="Nội dung lỗi" variant="standard" />
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField onBlur={handleBlur} name="nameImporter" id="filled-basic" error={validateNameImport.error} helperText={validateNameImport.msg} value={nameImporter} onChange={(e) => {
-                            if (validateNameImport.error) {
-                                setValidateNameImport(initValidate);
+                        <TextField type="number" fullWidth value={numNG} helperText={validateNumNG.msg} error={validateNumNG.error} onChange={(e) => { setValidateNumNG(initValidate); setNumNG(e.target.value); }} placeholder="Nhập số lượng..." label="Số lượng" variant="standard" />
+                    </Grid>
+                    <Grid sx={{ textAlign: 'right' }} item xs={1.5}>
+                        <Button onClick={hanldeAddInputNG} sx={{ marginTop: '20px' }} variant="text" startIcon={<AddIcon />}>
+                            Add
+                        </Button>
+                    </Grid>
+                </Grid>
+                <Box sx={{ padding: '3px', border: '1px solid #ddd' }}>
+
+                    <Box >
+                        <Grid sx={{ padding: '5px', width: '100%', borderBottom: '1px solid #ddd' }} spacing={1} container>
+                            <Grid item xs={1}>
+                                <Typography sx={{ fontWeight: 'bold' }} >
+                                    STT
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6.5}>
+                                <Typography sx={{ fontWeight: 'bold' }} >
+                                    Name
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={3}>
+                                <Typography sx={{ fontWeight: 'bold' }} >
+                                    Total
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={1.5}>
+                                <Typography sx={{ fontWeight: 'bold' }} >
+                                    Action
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        <Box sx={{
+                            maxHeight: '170px', overflowY: 'auto', '&::-webkit-scrollbar': {
+                                width: '2px',
+                            }, '&::-webkit-scrollbar-thumb': {
+                                background: 'rgba(52, 49, 76, 1)',
                             }
-                            setNameImporter(e.target.value)
-                        }} label="Tên người nhập" variant="filled" />
-                    </Grid>
-                </Grid>
+                        }}>
 
-                <Typography variant="p" component={'p'} fontWeight={'bold'}>Thông tin hàng hóa</Typography>
-                <Grid sx={{ margin: '10px 0px' }} spacing={1} container>
-                    <Grid item xs={3}>
-                        <Autocomplete
-
-                            value={modelCode}
-                            onChange={(event, newValue) => {
-                                console.log(newValue);
-                                setModelCode(newValue);
-                            }}
-                            disablePortal
-                            options={MODEL}
-                            renderInput={(params) => <TextField placeholder="Nhập tên model..." variant="standard" {...params} label="Model" />}
-                        />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Autocomplete
-                            value={stage}
-                            onChange={(event, newValue) => {
-                                setStage(newValue);
-                            }}
-                            disablePortal
-                            options={STAGES}
-                            renderInput={(params) => <TextField placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
-                        />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Autocomplete
-
-                            value={color}
-                            onChange={(event, newValue) => {
-                                console.log(newValue);
-                                setColor(newValue);
-                            }}
-                            disablePortal
-                            options={COLORS}
-                            renderInput={(params) => <TextField placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
-                        />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <TextField placeholder="Nhập thông tin máy..." label="Máy" value={machine} onChange={(e) => { setMachine(e.target.value) }} variant="standard" />
-                    </Grid>
-                </Grid>
-                <Grid sx={{ margin: '10px 0px' }} spacing={1} container>
-                    <Grid item xs={3}>
-                        <TextField label="Số lượng" error={validateQuantity.error} helperText={validateQuantity.msg} onChange={(e) => {
-                            if (validateQuantity.error) {
-                                setValidateQuantity(initValidate);
-                            }
-                            setQuantity(e.target.value);
-                        }} type="number" value={quantity} onBlur={handleBlur} name="quantity" placeholder="Nhập tổng số lượng" variant="standard" />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <TextField error={validateTotalOK.error} helperText={validateTotalOK.msg} label="Tổng số OK" onBlur={handleBlur} name="totalOK" onChange={onChangeTotalOK} type="number" value={totalOK} placeholder="Nhập tổng số OK" variant="standard" />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <TextField error={validateTotalNG.error} helperText={validateTotalNG.msg} placeholder="Nhập tổng số NG" onBlur={handleBlur} name="totalNG" onChange={onChangeTotalNG} type="number" value={totalNG} label="Tổng số NG" variant="standard" />
-                    </Grid>
-                    <Grid item xs={3}>
-                        <TextField label="Tỷ lệ(%)" InputProps={{
-                            readOnly: true,
-                        }} value={percent} onChange={(e) => { setMachine(e.target.value) }} variant="standard" />
-                    </Grid>
-                </Grid>
-                <Typography variant="p" component={'p'} fontWeight={'bold'}>Thông tin hàng NG</Typography>
-                <Grid sx={{ margin: '10px 0px', width: '100%' }} spacing={1} container>
-                    <Grid item xs={6}>
-                        <TextField fullWidth placeholder="Nhập nội dung lỗi..." label="Nội dung lỗi" variant="standard" />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField fullWidth placeholder="Nhập số lượng..." label="Số lượng" variant="standard" />
-                    </Grid>
-                </Grid>
-                <Typography variant="p" component={'p'} fontWeight={'bold'}>Ghi chú</Typography>
-                <Grid sx={{ margin: '10px 0px', width: '100%' }} spacing={1} container>
-                    <TextField
-                        value={note}
-                        onChange={(e) => { setNote(e.target.value) }}
-                        fullWidth
-                        placeholder="Nhập ghi chú..."
-                        label="Ghi chú"
-                        multiline
-                        rows={8}
-                    />
+                            {listNG?.length > 0 ? (
+                                listNG.map((item, index) => (<Grid sx={{ margin: '10px 0px', width: '100%', borderBottom: index === listNG?.length - 1 ? '' : '1px solid #ddd' }} spacing={1} container>
+                                    <Grid item xs={1}>
+                                        {index + 1}
+                                    </Grid>
+                                    <Grid item xs={6.5}>
+                                        {item?.name}
+                                    </Grid>
+                                    <Grid item xs={3}>
+                                        {item?.totalNG}
+                                    </Grid>
+                                    <Grid item xs={1.5}>
+                                        <IconButton onClick={() => { handleClearRowNG(index) }} aria-label="delete" size="small">
+                                            <DeleteIcon sx={{ color: 'red' }} fontSize="inherit" />
+                                        </IconButton>
+                                    </Grid>
+                                </Grid>))
+                            ) : (
+                                <Grid sx={{ margin: '10px 0px', width: '100%', display: 'flex', justifyContent: 'center' }} spacing={1} container>
+                                    <Typography sx={{ textAlign: 'center' }} >
+                                        chưa có dữ lệu
+                                    </Typography>
+                                </Grid>
+                            )}
+                        </Box>
+                    </Box>
+                </Box>
+                <Typography variant="p" component={'p'} sx={{ marginTop: '20px' }} fontWeight={'bold'}>Ghi chú</Typography>
+                <Grid sx={{ margin: '10px 0px', width: '100%', height: '200px' }} spacing={1} container>
+                    <QuillEditor data={note} setData={setNote} />
                 </Grid>
             </Box>
             {/* </DialogContent> */}
@@ -508,11 +650,11 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                 <Button sx={{ color: 'black', fontWeight: 'bold' }} onClick={onCloseModal}>
                     Đóng
                 </Button>
-                <Button variant="contained" autoFocus onClick={onCloseModal}>
+                <Button variant="contained" autoFocus onClick={handleClickSave}>
                     Lưu
                 </Button>
             </DialogActions>
-        </CustomModal>
+        </CustomModal >
         <ModalAddModel open={openModalAddModel} onCloseModal={onCloseModalAddModel} />
     </>);
 }

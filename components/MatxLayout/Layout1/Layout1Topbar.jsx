@@ -10,7 +10,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Span } from '../../../components/Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
-import ShoppingCart from '../../ShoppingCart';
 import { deepOrange, deepPurple } from '@mui/material/colors';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
@@ -136,7 +135,7 @@ const Layout1Topbar = () => {
               <UserMenu>
                 <Hidden xsDown>
                   <Icon> person </Icon>
-                  <Span><strong>{user.name}</strong>
+                  <Span><strong>{user.username}</strong>
                   </Span>
                 </Hidden>
               </UserMenu>

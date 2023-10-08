@@ -1,7 +1,11 @@
-import React, { createContext, useEffect, useReducer } from 'react'
-import jwtDecode from 'jwt-decode'
-import axios from 'axios.js'
-import { MatxLoading } from 'components'
+import React, { createContext, useEffect, useReducer } from 'react';
+import jwtDecode from 'jwt-decode';
+import axios from 'axios.js';
+import { MatxLoading } from 'components';
+import { RouteApi } from 'RouteApi';
+import { ConfigApp } from 'config';
+import { ASSET_TOKEN, DATA_USER } from 'utils/constant';
+
 
 const initialState = {
     isAuthenticated: false,
@@ -11,21 +15,23 @@ const initialState = {
 
 const isValidToken = (accessToken) => {
     if (!accessToken) {
-        return false
+        return false;
     }
 
     const decodedToken = jwtDecode(accessToken)
-    const currentTime = Date.now() / 1000
-    return decodedToken.exp > currentTime
+    const currentTime = Date.now() / 1000;
+    return decodedToken.exp > currentTime;
 }
 
-const setSession = (accessToken) => {
+const setSession = (accessToken, user) => {
     if (accessToken) {
-        localStorage.setItem('accessToken', accessToken)
-        axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+        localStorage.setItem(DATA_USER, JSON.stringify(user));
+        localStorage.setItem(ASSET_TOKEN, accessToken);
+        axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
     } else {
-        localStorage.removeItem('accessToken')
-        delete axios.defaults.headers.common.Authorization
+        localStorage.removeItem(DATA_USER);
+        localStorage.removeItem(ASSET_TOKEN);
+        delete axios.defaults.headers.common.Authorization;
     }
 }
 
@@ -84,55 +90,58 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
 
     const login = async (username, password) => {
-        const response = await axios.post('/api/auth/login', {
+        const response = await axios.post(`${ConfigApp.API_URL}${RouteApi.login}`, {
             username,
             password,
         })
-        const { accessToken, user } = response.data;
+        if (response?.data?.user) {
 
-        setSession(accessToken)
+            const { accessToken, user } = response.data;
 
-        dispatch({
-            type: 'LOGIN',
-            payload: {
-                user,
-            },
-        })
+            setSession(accessToken, user);
+
+            dispatch({
+                type: 'LOGIN',
+                payload: {
+                    user,
+                },
+            })
+        }
+        return null;
     }
 
     const register = async (email, username, password) => {
-        const response = await axios.post('/api/auth/register', {
-            email,
-            username,
-            password,
-        })
+        // const response = await axios.post('/api/auth/register', {
+        //     email,
+        //     username,
+        //     password,
+        // })
 
-        const { accessToken, user } = response.data
+        // const { accessToken, user } = response.data
 
-        setSession(accessToken)
+        // setSession(accessToken)
 
-        dispatch({
-            type: 'REGISTER',
-            payload: {
-                user,
-            },
-        })
+        // dispatch({
+        //     type: 'REGISTER',
+        //     payload: {
+        //         user,
+        //     },
+        // })
     }
 
     const logout = () => {
-        setSession(null)
-        dispatch({ type: 'LOGOUT' })
+        setSession(null);
+        dispatch({ type: 'LOGOUT' });
     }
 
     useEffect(() => {
         ; (async () => {
             try {
-                const accessToken = window.localStorage.getItem('accessToken')
-
+                const accessToken = window.localStorage.getItem(ASSET_TOKEN);
                 if (accessToken && isValidToken(accessToken)) {
                     setSession(accessToken)
-                    const response = await axios.get('/api/auth/profile')
-                    const { user } = response.data
+                    const response = await axios.get(`${ConfigApp.API_URL}${RouteApi.profile}`);
+                    const user = response.data;
 
                     dispatch({
                         type: 'INIT',

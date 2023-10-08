@@ -5,6 +5,7 @@ import sessionRoutes from 'views/sessions/SessionRoutes';
 import { Navigate } from 'react-router-dom';
 import MatxLayout from './components/MatxLayout/MatxLayout';
 import { ConfigRouter } from './ConfigRouter';
+import NotAuth from 'auth/NotAuth';
 
 const routes = [
   {
@@ -15,7 +16,13 @@ const routes = [
     ),
     children: [...dashboardRoutes],
   },
-  ...sessionRoutes,
+  {
+    // element: (
+    //   <NotAuth />
+    // ),
+    children: [...sessionRoutes],
+  },
+  // ...sessionRoutes,
   // { path: ConfigRouter.home, element: <Navigate to={ConfigRouter.home} /> },
   { path: '*', element: <NotFound /> },
 ];
