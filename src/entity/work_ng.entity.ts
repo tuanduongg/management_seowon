@@ -13,8 +13,6 @@ export class WorkNG {
   NG_name: string;
   @Column()
   total: number;
-  @Column()
+  @Column({nullable: true})
   status: string;
-  @Column()
-  note: string;
 }

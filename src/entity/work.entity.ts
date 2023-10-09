@@ -5,22 +5,24 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 export class Work {
   @PrimaryGeneratedColumn()
   work_id: number;
-  @Column()
+  @Column({ nullable: true })
   shift: string;
-  @Column()
+  @Column({ nullable: true })
   day: number;
-  @Column()
+  @Column({ nullable: true })
   month: number;
-  @Column()
+  @Column({ nullable: true })
   year: number;
-  @Column()
+  @Column({ nullable: true })
   week: number;
-  @Column()
+  @Column({ nullable: true })
   time_id: number;
-  @Column()
+  @Column({ nullable: true })
   department_id: number;
-  @Column()
+  @Column({ nullable: true })
   importer: string;
+  @Column({ nullable: true })
+  note: string;
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;
