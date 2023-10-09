@@ -5,6 +5,7 @@ import { MatxLoading } from 'components';
 import { RouteApi } from 'RouteApi';
 import { ConfigApp } from 'config';
 import { ASSET_TOKEN, DATA_USER } from 'utils/constant';
+import restApi from 'utils/restAPI';
 
 
 const initialState = {
@@ -90,10 +91,11 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
 
     const login = async (username, password) => {
-        const response = await axios.post(`${ConfigApp.API_URL}${RouteApi.login}`, {
+        const response = await restApi.post(RouteApi.login, {
             username,
             password,
-        })
+        });
+
         if (response?.data?.user) {
 
             const { accessToken, user } = response.data;
@@ -139,8 +141,8 @@ export const AuthProvider = ({ children }) => {
             try {
                 const accessToken = window.localStorage.getItem(ASSET_TOKEN);
                 if (accessToken && isValidToken(accessToken)) {
-                    setSession(accessToken)
-                    const response = await axios.get(`${ConfigApp.API_URL}${RouteApi.profile}`);
+                    setSession(accessToken);
+                    const response = await restApi.get(RouteApi.profile);
                     const user = response.data;
 
                     dispatch({

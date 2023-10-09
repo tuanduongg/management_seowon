@@ -1,9 +1,12 @@
 // import axios from 'axios';
-// import { ConfigApp } from 'config';
+import { ConfigApp } from 'config';
 
-// const axiosInstance = axios.create({
-//   baseURL:ConfigApp.API_URL, // Thay thế bằng URL API thực tế của bạn
-// });
+import { ASSET_TOKEN } from './constant';
+import axios from 'axios';
+
+const restApi = axios.create({
+    baseURL: ConfigApp.API_URL, // Thay thế bằng URL API thực tế của bạn
+});
 
 // const SendRequest = async (method, url, data = null, headers = {}) => {
 //   try {
@@ -21,35 +24,36 @@
 
 // export default SendRequest;
 
-const axios = require('axios');
-const axiosApiInstance = axios.create();
+// const axios = require('axios');
+// const restApi = axios.create();
 // Request interceptor for API calls
-axiosApiInstance.interceptors.request.use(
+restApi.interceptors.request.use(
     async config => {
-        const value = await redisClient.get(rediskey)
-        const keys = JSON.parse(value)
+        const assToken = window.localStorage.getItem(ASSET_TOKEN);
         config.headers = {
-            'Authorization': `Bearer ${keys.access_token}`,
+            'Authorization': `Bearer ${assToken}`,
             'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            // 'Content-Type': 'application/x-www-form-urlencoded'
         }
         return config;
     },
     error => {
-        Promise.reject(error)
+        Promise.reject(error);
     });
 // Response interceptor for API calls
-axiosApiInstance.interceptors.response.use((response) => {
+restApi.interceptors.response.use((response) => {
+
     return response
 }, async function (error) {
-    const originalRequest = error.config;
-    if (error.response.status === 403 && !originalRequest._retry) {
-        originalRequest._retry = true;
-        const access_token = await refreshAccessToken();
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-        return axiosApiInstance(originalRequest);
-    }
+    console.log('error', error);
+    // const originalRequest = error.config;
+    // if (error.response.status === 403 && !originalRequest._retry) {
+    //     originalRequest._retry = true;
+    //     const access_token = await refreshAccessToken();
+    //     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+    //     return restApi(originalRequest);
+    // }
     return Promise.reject(error);
 });
 
-export default axiosApiInstance;
+export default restApi;

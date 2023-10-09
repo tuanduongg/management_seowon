@@ -11,6 +11,10 @@ import style from './modal_add_report.module.css';
 import QuillEditor from "components/QuillEditor";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import restApi from "utils/restAPI";
+import { RouteApi } from "RouteApi";
+import { useSelector } from 'react-redux';
+import ModalAddNewData from "components/ModalAddNewData";
 
 const CustomModal = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -26,12 +30,12 @@ const CustomModal = styled(Dialog)(({ theme }) => ({
 
 const SHIFT = [
     {
-        id: 'a',
-        name: 'A(Ngày)'
+        id: 'A',
+        name: 'DAY(Ngày)'
     },
     {
-        id: 'b',
-        name: 'B(Đêm)'
+        id: 'B',
+        name: 'NIGHT(Đêm)'
     }
 ];
 
@@ -41,20 +45,6 @@ const ARRYEAR = Array.from({ length: 19 }, (_, i) => new Date().getFullYear() - 
 // }
 
 const DAY = [];
-const DEPARTMENT = [
-    {
-        department_id: '1',
-        department_name: 'Converting'
-    },
-    {
-        department_id: '2',
-        department_name: 'Rubber'
-    },
-    {
-        department_id: '3',
-        department_name: 'Assy'
-    },
-];
 // const TIME = [
 //     {
 //         id: '1',
@@ -94,25 +84,6 @@ const DEPARTMENT = [
 // ]
 
 const TIMETEXT = ['A', 'B', 'C', 'D', 'E', 'F'];
-
-const MODEL = [
-    { 'model_code': '1', 'label': 'AAA' },
-    { 'model_code': '2', 'label': 'BBB' },
-    { 'model_code': '3', 'label': 'CCC' },
-];
-
-const STAGES = [
-    { 'stage_id': '1', 'label': 'Ngoại quan mực' },
-    { 'stage_id': '2', 'label': 'Edge coat TOP' },
-    { 'stage_id': '3', 'label': 'Packing' },
-    { 'stage_id': '4', 'label': 'Hot Press' },
-];
-const COLORS = [
-    { 'color_code': '1', 'label': 'Green' },
-    { 'color_code': '2', 'label': 'Black' },
-    { 'color_code': '3', 'label': 'Lavender' },
-    { 'color_code': '4', 'label': 'Beige' },
-];
 const ListNG = [
     // { 'id': '1', 'name': 'Loang mực', totalNG: 160 },
     // { 'id': '2', 'name': 'Bẩn mực', totalNG: 150 },
@@ -131,8 +102,14 @@ const inititalNG = {
     helperText: ''
 }
 
+const initOption = {
+    value: 'addNew',
+    label: 'Thêm mới...',
+    color: 'blue'
+}
 
-const ModalAddReport = ({ open, onCloseModal }) => {
+
+const ModalAddReport = ({ open, handleClose }) => {
 
     const { t, i18n } = useTranslation();
     const [shift, setShift] = useState(SHIFT[0].id);
@@ -140,7 +117,7 @@ const ModalAddReport = ({ open, onCloseModal }) => {
     const [week, setWeek] = useState(getCurrentWeek());
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
-    const [time, setTime] = useState(TIMETEXT[0]);
+    const [time, setTime] = useState('');
 
     const [department, setDepartment] = useState('');
     const [validateDepart, setValidateDepart] = useState(initValidate);
@@ -176,12 +153,97 @@ const ModalAddReport = ({ open, onCloseModal }) => {
     const [validateNumNG, setValidateNumNG] = useState(initValidate);
 
     const [scroll, setScroll] = useState('paper');
+    const [openModalAddData, setOpenModalAddData] = useState(false);
+    const [typeModalAddData, setTypeModalAddData] = useState('');
+
+
+    const [ListTime, setListTime] = useState([]);
+    const [ListStage, setListStage] = useState([]);
+    const [ListColor, setListColors] = useState([]);
+    const [ListDepart, setListDepart] = useState([]);
+    const [ListModel, setListModel] = useState([]);
 
     const contentRef = useRef(null);
 
 
+    const onCloseModal = (e, reason) => {
+        if (reason && reason === "backdropClick") {
+            return
+            // return;
+        }
+        handleClose();
+
+        setShift('');
+        setDay('');
+        setWeek('');
+        setMonth('');
+        setYear('');
+        setTime('');
+        setDepartment('');
+        setValidateDepart(initValidate);
+        setNameImporter('');
+        setValidateNameImport(initValidate);
+        setModelCode('');
+        setStage('');
+        setColor('');
+        setMachine('');
+        setQuantity('');
+        setValidateQuantity(initValidate);
+        setTotalOK('');
+        setVaidateTotalOK('');
+        setTotalNG('');
+        setVaidateTotalNG(initValidate);
+        setPercent('');
+        setNote('');
+        setListNG('');
+        setNameNG('');
+        setValidateNameNG(initValidate);
+        setNumNG('');
+        setValidateNumNG(initValidate);
+    }
+
+
+
+    const getDataMaster = async () => {
+        const response = await restApi.get(RouteApi.data_master);
+        if (response?.status === 200) {
+            const { colors, departments, models, stages, times } = response?.data;
+            if (colors) {
+                const dataList = colors.map(item => ({
+                    label: item.color_name,
+                    value: item.color_id
+                }));
+                setListColors(dataList);
+            }
+            if (departments) {
+                setListDepart(departments);
+            }
+            if (models) {
+                const dataListModel = models.map(item => ({
+                    label: `${item.model_name}(${item?.model_code})`,
+                    value: item.model_id
+                }));
+                setListModel(dataListModel);
+            }
+            if (stages) {
+                const dataListStage = stages.map(item => ({
+                    label: `${item.stage_name}`,
+                    value: item.stage_id
+                }));
+                setListStage(dataListStage);
+            }
+            setListTime(times);
+
+        }
+    }
+    useEffect(() => {
+        getDataMaster();
+    }, []);
+
+
 
     const onCloseModalAddModel = () => {
+
         setOpenModalAddModel(false);
     }
 
@@ -239,7 +301,7 @@ const ModalAddReport = ({ open, onCloseModal }) => {
         switch (name) {
             case 'quantity':
                 if (!quantity) {
-                    setValidateQuantity({ error: true, msg: 'Tổng số lượng không được để trống' })
+                    setValidateQuantity({ error: true, msg: 'Tổng số lượng không được để trống' });
                     return;
                 } else {
                     if (parseInt(quantity) < parseInt(totalOK)) {
@@ -312,9 +374,91 @@ const ModalAddReport = ({ open, onCloseModal }) => {
     }
 
     const handleClickSave = () => {
-        alert('saving');
+        let check = true;
+        if (!quantity) {
+            setValidateQuantity({ error: true, msg: 'Tổng số lượng không được để trống' });
+            check = false;
+            // return;
+        } else {
+            if (parseInt(quantity) < parseInt(totalOK)) {
+                setValidateQuantity({ error: true, msg: 'Tổng số lượng phải lớn hơn số lượng OK' });
+                check = false;
+                // return;
+            }
+
+            if (parseInt(quantity) < parseInt(totalNG)) {
+                setValidateQuantity({ error: true, msg: 'Tổng số lượng phải lớn hơn số luợng NG' });
+                check = false;
+                // return;
+            }
+
+        }
+
+        if (!totalOK) {
+            setVaidateTotalOK({ error: true, msg: 'Tổng số OK không được để trống' })
+            check = false;
+            // return;
+        } else {
+            if (parseInt(totalOK) < 0) {
+                setVaidateTotalOK({ error: true, msg: 'Tổng số OK phải lớn hơn hoặc bằng 0' });
+                check = false;
+                // return;
+            }
+
+            if (parseInt(totalOK) > parseInt(quantity)) {
+                setVaidateTotalOK({ error: true, msg: 'Tổng số OK phải nhỏ hơn Số lượng' });
+                check = false;
+                // return;
+            }
+
+        }
+
+        if (totalNG) {
+            if (totalNG < 0) {
+                setVaidateTotalNG({ error: true, msg: 'Tổng số NG phải lớn hơn hoặc bằng 0' });
+                check = false;
+                // return;
+            }
+            if (parseInt(totalNG) > parseInt(quantity)) {
+                setVaidateTotalNG({ error: true, msg: 'Tổng số NG phải nhỏ hơn Số lượng' });
+                check = false;
+                // return;
+            }
+
+        }
+        if (!nameImporter || nameImporter.length < 1) {
+            setValidateNameImport({ error: true, msg: 'Tên người nhập không được để trống' });
+            check = false;
+            // return;
+        }
+        if (!department || department.length < 1) {
+            setValidateDepart({ error: true, msg: 'Phòng ban không được để trống' });
+            check = false;
+            // return;
+        }
+        if (check) {
+            onSaving();
+        }
     }
 
+    const onSaving = async () => {
+        const dataObj = {
+            shift,
+            time,
+            week,
+            day, month, year, department, nameImporter, modelCode, stage,
+            color, machine, totalNG, totalOK, quantity, percent,
+            note, listNG
+        };
+        const data = JSON.stringify(dataObj);
+        const response = await restApi.post(RouteApi.addWork, { data: data });
+        console.log(response);
+        if (response?.status === 201) {
+            handleClose();
+        } else {
+
+        }
+    }
 
     const hanldeAddInputNG = () => {
         if (nameNG?.trim().length < 1) {
@@ -326,6 +470,8 @@ const ModalAddReport = ({ open, onCloseModal }) => {
             return;
         }
 
+
+
         setListNG([...listNG, { name: nameNG, totalNG: numNG }]);
 
         // { 'id': '4', 'name': 'Vết đâm lõm', totalNG: 130 },
@@ -336,12 +482,31 @@ const ModalAddReport = ({ open, onCloseModal }) => {
         setListNG(arr);
     }
 
-    const getDataMaster = () => {
-        const
-    }
-    useEffect(() => {
 
-    }, []);
+    const onCloseModalAddNewData = () => {
+
+        setOpenModalAddData(false);
+    }
+
+    const onAfterAddData = (data) => {
+        switch (typeModalAddData) {
+            case 'COLOR':
+                const newData = { 'label': data?.color_name, 'value': data?.color_id };
+                setListColors([...ListColor, newData]);
+                setColor(newData);
+                break;
+            case 'STAGE':
+                const newData2 = { 'label': data?.stage_name, 'value': data?.stage_id };
+                setListStage([...ListStage, newData2]);
+                setStage(newData2);
+                break;
+            default:
+                break;
+        }
+        setOpenModalAddData(false);
+    }
+
+
 
     return (<>
         <CustomModal
@@ -380,6 +545,13 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Ca</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     placeholder="Nhập ca làm việc..."
                                     value={shift}
                                     label="Ca"
@@ -392,16 +564,23 @@ const ModalAddReport = ({ open, onCloseModal }) => {
 
                         </Grid>
                         <Grid item xs={1.5}>
-                            <FormControl sx={{ m: 1 }} variant="standard">
+                            <FormControl sx={{ m: 1, width: '90%' }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Time</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     placeholder="Nhập Time làm việc..."
                                     value={time}
                                     label="Time"
                                     onChange={(e) => { setTime(e.target.value) }}
                                 >
-                                    {TIMETEXT.map((item) =>
-                                        (<MenuItem key={item} value={item}>{item}</MenuItem>))}
+                                    {ListTime.map((item) =>
+                                        (<MenuItem key={item?.time_id} value={item?.time_id}>{item?.time_name}</MenuItem>))}
                                 </Select>
                             </FormControl>
 
@@ -410,6 +589,13 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Tuần</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     placeholder="Nhập tuần..."
                                     value={week}
                                     label="Tuần"
@@ -425,6 +611,13 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <FormControl variant="standard" sx={{ m: 1, minWidth: 100 }}>
                                 <InputLabel id="demo-simple-select-standard-label">Ngày</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     placeholder="Nhập ngày..."
                                     value={day}
                                     label="Ngày"
@@ -441,6 +634,13 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Tháng</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     value={month}
                                     placeholder="Nhập tháng..."
                                     label="Tháng"
@@ -456,6 +656,13 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <FormControl sx={{ m: 1, minWidth: 120 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Năm</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     value={year}
                                     label="Năm"
                                     placeholder="Nhập năm..."
@@ -473,6 +680,13 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <FormControl error={validateDepart.error} sx={{ m: 1, minWidth: 120 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Phòng ban</InputLabel>
                                 <Select
+                                    MenuProps={{
+                                        sx: {
+                                            "&& .Mui-selected": {
+                                                backgroundColor: "#bdbdbd"
+                                            }
+                                        }
+                                    }}
                                     onBlur={handleBlur}
                                     name="department"
                                     value={department}
@@ -480,7 +694,7 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                                     placeholder="Nhập phòng ban..."
                                     onChange={handleChangeDepartment}
                                 >
-                                    {DEPARTMENT.map((item, index) =>
+                                    {ListDepart.map((item, index) =>
                                         (<MenuItem key={item.department_id} value={item.department_id}>{item.department_name}</MenuItem>))}
                                 </Select>
                                 {validateDepart.error && (<FormHelperText>{validateDepart.msg}</FormHelperText>)}
@@ -506,36 +720,77 @@ const ModalAddReport = ({ open, onCloseModal }) => {
                             <Autocomplete
 
                                 value={modelCode}
+                                sx={{
+                                    "& + .MuiAutocomplete-popper .MuiAutocomplete-option[aria-selected='true']":
+                                    {
+                                        backgroundColor: "#ddd",
+                                    },
+                                }}
                                 onChange={(event, newValue) => {
-                                    console.log(newValue);
                                     setModelCode(newValue);
                                 }}
                                 disablePortal
-                                options={MODEL}
+                                options={ListModel}
                                 renderInput={(params) => <TextField placeholder="Nhập tên model..." variant="standard" {...params} label="Model" />}
                             />
                         </Grid>
                         <Grid item xs={3}>
                             <Autocomplete
+                                renderOption={(props, option) => {
+                                    const { label, color } = option;
+                                    return (
+                                        <span {...props} style={{ color: color }}>
+                                            {label}
+                                        </span>
+                                    );
+                                }}
+                                sx={{
+                                    "& + .MuiAutocomplete-popper .MuiAutocomplete-option[aria-selected='true']":
+                                    {
+                                        backgroundColor: "#ddd",
+                                    },
+                                }}
                                 value={stage}
                                 onChange={(event, newValue) => {
+                                    if (newValue?.value === 'addNew') {
+                                        setTypeModalAddData('STAGE')
+                                        setOpenModalAddData(true);
+                                        return;
+                                    }
                                     setStage(newValue);
                                 }}
                                 disablePortal
-                                options={STAGES}
-                                renderInput={(params) => <TextField placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
+                                options={[...ListStage, initOption]}
+                                renderInput={(params) => <TextField name="stage" placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
                             />
                         </Grid>
                         <Grid item xs={3}>
                             <Autocomplete
-
+                                sx={{
+                                    "& + .MuiAutocomplete-popper .MuiAutocomplete-option[aria-selected='true']":
+                                    {
+                                        backgroundColor: "#ddd",
+                                    },
+                                }}
+                                renderOption={(props, option) => {
+                                    const { label, color } = option;
+                                    return (
+                                        <span {...props} style={{ color: color }}>
+                                            {label}
+                                        </span>
+                                    );
+                                }}
                                 value={color}
                                 onChange={(event, newValue) => {
-                                    console.log(newValue);
+                                    if (newValue?.value === 'addNew') {
+                                        setTypeModalAddData('COLOR')
+                                        setOpenModalAddData(true);
+                                        return;
+                                    }
                                     setColor(newValue);
                                 }}
                                 disablePortal
-                                options={COLORS}
+                                options={[...ListColor, initOption]}
                                 renderInput={(params) => <TextField placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
                             />
                         </Grid>
@@ -656,6 +911,7 @@ const ModalAddReport = ({ open, onCloseModal }) => {
             </DialogActions>
         </CustomModal >
         <ModalAddModel open={openModalAddModel} onCloseModal={onCloseModalAddModel} />
+        <ModalAddNewData open={openModalAddData} onCloseModal={onCloseModalAddNewData} afterSave={onAfterAddData} typeModal={typeModalAddData} />
     </>);
 }
 

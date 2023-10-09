@@ -127,11 +127,8 @@ const DailyReport = () => {
     }
 
 
-    const handleCloseModalAdd = (event, reason) => {
-        if (reason && reason == "backdropClick") {
-            return
-            // return;
-        }
+    const handleCloseModalAdd = () => {
+
 
         setOpenModalAdd(false);
     }
@@ -219,7 +216,7 @@ const DailyReport = () => {
             </Grid>
         </ContentBox >
         <ConfirmationDialog open={false} text={'confirm text'} onYesClick={() => { console.log('onclickyes') }} />
-        <ModalAddReport open={openModalAdd} onCloseModal={handleCloseModalAdd} />
+        <ModalAddReport open={openModalAdd} handleClose={handleCloseModalAdd} />
     </>);
 
 }
