@@ -23,8 +23,6 @@ const MultipleSelect = () => {
         <>
             <Select
                 size="small"
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
                 value={language}
                 label="Ngôn ngữ"
                 onChange={handleChange}

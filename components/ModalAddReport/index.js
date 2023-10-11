@@ -15,8 +15,10 @@ import restApi from "utils/restAPI";
 import { RouteApi } from "RouteApi";
 import { useSelector } from 'react-redux';
 import ModalAddNewData from "components/ModalAddNewData";
+import { ShowAlert } from "utils/confirm";
 
 const CustomModal = styled(Dialog)(({ theme }) => ({
+    zIndex: 100, // Set your desired z-index value
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
     },
@@ -109,7 +111,7 @@ const initOption = {
 }
 
 
-const ModalAddReport = ({ open, handleClose }) => {
+const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, rowSelected }) => {
 
     const { t, i18n } = useTranslation();
     const [shift, setShift] = useState(SHIFT[0].id);
@@ -204,10 +206,42 @@ const ModalAddReport = ({ open, handleClose }) => {
 
 
 
-    const getDataMaster = async () => {
-        const response = await restApi.get(RouteApi.data_master);
-        if (response?.status === 200) {
-            const { colors, departments, models, stages, times } = response?.data;
+    // const getDataMaster = async () => {
+    //     const response = await restApi.get(RouteApi.data_master);
+    //     if (response?.status === 200) {
+    //         const { colors, departments, models, stages, times } = response?.data;
+    //         if (colors) {
+    //             const dataList = colors.map(item => ({
+    //                 label: item.color_name,
+    //                 value: item.color_id
+    //             }));
+    //             setListColors(dataList);
+    //         }
+    //         if (departments) {
+    //             setListDepart(departments);
+    //         }
+    //         if (models) {
+    //             const dataListModel = models.map(item => ({
+    //                 label: `${item.model_name}(${item?.model_code})`,
+    //                 value: item.model_id,
+    //                 colorId: item.colorId,
+    //             }));
+    //             setListModel(dataListModel);
+    //         }
+    //         if (stages) {
+    //             const dataListStage = stages.map(item => ({
+    //                 label: `${item.stage_name}`,
+    //                 value: item.stage_id
+    //             }));
+    //             setListStage(dataListStage);
+    //         }
+    //         setListTime(times);
+
+    //     }
+    // }
+    useEffect(() => {
+        if (dataMaster) {
+            const { colors, departments, models, stages, times } = dataMaster;
             if (colors) {
                 const dataList = colors.map(item => ({
                     label: item.color_name,
@@ -221,7 +255,8 @@ const ModalAddReport = ({ open, handleClose }) => {
             if (models) {
                 const dataListModel = models.map(item => ({
                     label: `${item.model_name}(${item?.model_code})`,
-                    value: item.model_id
+                    value: item.model_id,
+                    colorId: item.colorId,
                 }));
                 setListModel(dataListModel);
             }
@@ -233,14 +268,71 @@ const ModalAddReport = ({ open, handleClose }) => {
                 setListStage(dataListStage);
             }
             setListTime(times);
-
         }
+    }, [dataMaster]);
+
+    const getModelById = (id) => {
+        if (id) {
+
+            const data = ListModel.find((item) => item?.value === id);
+            return data;
+        }
+        return null;
     }
+    const getStageById = (id) => {
+        if (id) {
+
+            const data = ListStage.find((item) => item?.value === id);
+            return data;
+        }
+        return null;
+    }
+
     useEffect(() => {
-        getDataMaster();
-    }, []);
+        if (rowSelected) {
+            if (rowSelected?.work) {
+                const {
+                    work_id,
+                    shift,
+                    day,
+                    month,
+                    year,
+                    week,
+                    time_id,
+                    department_id,
+                    importer,
+                    note,
+                    id,
+                    modelId,
+                    workId,
+                    stageId,
+                    quantity,
+                    qtyOK,
+                    qtyNG,
+                    machine
+                } = rowSelected.work;
+                setWeek(week);
+                setDay(day);
+                setMonth(month);
+                setYear(year);
+                setTime(time_id);
+                setDepartment(department_id);
+                setNameImporter(importer);
+                setNote(note);
+                setShift(shift);
+                setQuantity(quantity);
+                setTotalOK(qtyOK);
+                setTotalNG(qtyNG);
+                setMachine(machine);
+                setModelCode(getModelById(modelId));
+                setStage(getStageById(stageId));
+            }
 
-
+            if (rowSelected?.workNG) {
+                setListNG(rowSelected?.workNG);
+            }
+        }
+    }, [rowSelected]);
 
     const onCloseModalAddModel = () => {
 
@@ -263,6 +355,10 @@ const ModalAddReport = ({ open, handleClose }) => {
     //         setModelCode(value);
     //     }
     // }
+    useEffect(() => {
+        const percent = getPercentNG(quantity, totalNG);
+        setPercent(percent);
+    }, [totalNG])
 
     const onClickAddModel = () => {
         setOpenModalAddModel(true);
@@ -442,6 +538,7 @@ const ModalAddReport = ({ open, handleClose }) => {
     }
 
     const onSaving = async () => {
+        let url = RouteApi.addWork;
         const dataObj = {
             shift,
             time,
@@ -450,13 +547,32 @@ const ModalAddReport = ({ open, handleClose }) => {
             color, machine, totalNG, totalOK, quantity, percent,
             note, listNG
         };
+        if (typeModal === 'EDIT') {
+            const {
+                work_id,
+                modelId,
+                id
+            } = rowSelected.work;
+            dataObj['work_id'] = work_id;
+            dataObj['modelId'] = modelId;
+            dataObj['workModelID'] = id;
+            url = RouteApi.updateWork;
+        }
         const data = JSON.stringify(dataObj);
-        const response = await restApi.post(RouteApi.addWork, { data: data });
-        console.log(response);
+        const response = await restApi.post(url, { data: data });
         if (response?.status === 201) {
-            handleClose();
+            return ShowAlert({
+                textProp: 'Cập nhật thông tin thành công!',
+                onClose: () => {
+                    afterSaved();
+                    handleClose();
+                }
+            });
         } else {
-
+            ShowAlert({
+                iconProp: 'warning',
+                textProp: 'Lỗi cập nhật!',
+            });
         }
     }
 
@@ -472,7 +588,7 @@ const ModalAddReport = ({ open, handleClose }) => {
 
 
 
-        setListNG([...listNG, { name: nameNG, totalNG: numNG }]);
+        setListNG([...listNG, { NG_name: nameNG, total: numNG }]);
 
         // { 'id': '4', 'name': 'Vết đâm lõm', totalNG: 130 },
     }
@@ -505,6 +621,23 @@ const ModalAddReport = ({ open, handleClose }) => {
         }
         setOpenModalAddData(false);
     }
+    const getColorById = (id) => {
+        if (id) {
+
+            const data = ListColor.find((item) => item?.value === id);
+            return data;
+        }
+        return null;
+    }
+    useEffect(() => {
+        if (modelCode) {
+
+            setColor(getColorById(modelCode?.colorId) ?? '');
+        }
+    }, [modelCode])
+    const onChangeModel = (event, newValue) => {
+        setModelCode(newValue);
+    }
 
 
 
@@ -516,7 +649,7 @@ const ModalAddReport = ({ open, handleClose }) => {
             open={open}
         >
             <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-                {t('title-modal-addreport')}
+                {typeModal === 'ADD' ? t('title-modal-addreport') : 'Chỉnh sửa thông tin'}
             </DialogTitle>
             <IconButton
                 aria-label="close"
@@ -579,7 +712,7 @@ const ModalAddReport = ({ open, handleClose }) => {
                                     label="Time"
                                     onChange={(e) => { setTime(e.target.value) }}
                                 >
-                                    {ListTime.map((item) =>
+                                    {ListTime?.map((item) =>
                                         (<MenuItem key={item?.time_id} value={item?.time_id}>{item?.time_name}</MenuItem>))}
                                 </Select>
                             </FormControl>
@@ -726,12 +859,42 @@ const ModalAddReport = ({ open, handleClose }) => {
                                         backgroundColor: "#ddd",
                                     },
                                 }}
-                                onChange={(event, newValue) => {
-                                    setModelCode(newValue);
-                                }}
+                                onChange={onChangeModel}
                                 disablePortal
                                 options={ListModel}
                                 renderInput={(params) => <TextField placeholder="Nhập tên model..." variant="standard" {...params} label="Model" />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Autocomplete
+                                disabled
+                                autoComplete='off'
+                                sx={{
+                                    "& + .MuiAutocomplete-popper .MuiAutocomplete-option[aria-selected='true']":
+                                    {
+                                        backgroundColor: "#ddd",
+                                    },
+                                }}
+                                renderOption={(props, option) => {
+                                    const { label, color } = option;
+                                    return (
+                                        <span {...props} style={{ color: color }}>
+                                            {label}
+                                        </span>
+                                    );
+                                }}
+                                value={color}
+                                onChange={(event, newValue) => {
+                                    if (newValue?.value === 'addNew') {
+                                        setTypeModalAddData('COLOR')
+                                        setOpenModalAddData(true);
+                                        return;
+                                    }
+                                    setColor(newValue);
+                                }}
+                                disablePortal
+                                options={[...ListColor, initOption]}
+                                renderInput={(params) => <TextField disabled placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
                             />
                         </Grid>
                         <Grid item xs={3}>
@@ -764,36 +927,7 @@ const ModalAddReport = ({ open, handleClose }) => {
                                 renderInput={(params) => <TextField name="stage" placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
                             />
                         </Grid>
-                        <Grid item xs={3}>
-                            <Autocomplete
-                                sx={{
-                                    "& + .MuiAutocomplete-popper .MuiAutocomplete-option[aria-selected='true']":
-                                    {
-                                        backgroundColor: "#ddd",
-                                    },
-                                }}
-                                renderOption={(props, option) => {
-                                    const { label, color } = option;
-                                    return (
-                                        <span {...props} style={{ color: color }}>
-                                            {label}
-                                        </span>
-                                    );
-                                }}
-                                value={color}
-                                onChange={(event, newValue) => {
-                                    if (newValue?.value === 'addNew') {
-                                        setTypeModalAddData('COLOR')
-                                        setOpenModalAddData(true);
-                                        return;
-                                    }
-                                    setColor(newValue);
-                                }}
-                                disablePortal
-                                options={[...ListColor, initOption]}
-                                renderInput={(params) => <TextField placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
-                            />
-                        </Grid>
+
                         <Grid item xs={3}>
                             <TextField placeholder="Nhập thông tin máy..." label="Máy" value={machine} onChange={(e) => { setMachine(e.target.value) }} variant="standard" />
                         </Grid>
@@ -874,10 +1008,10 @@ const ModalAddReport = ({ open, handleClose }) => {
                                         {index + 1}
                                     </Grid>
                                     <Grid item xs={6.5}>
-                                        {item?.name}
+                                        {item?.NG_name}
                                     </Grid>
                                     <Grid item xs={3}>
-                                        {item?.totalNG}
+                                        {item?.total}
                                     </Grid>
                                     <Grid item xs={1.5}>
                                         <IconButton onClick={() => { handleClearRowNG(index) }} aria-label="delete" size="small">

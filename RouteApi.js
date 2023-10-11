@@ -1,7 +1,11 @@
 export const RouteApi = {
     login: '/auth/login',
     profile: '/auth/profile',
-    data_master: '/works/all',
+    data_master: '/works/master',
     addDataMaster: '/works/addNewData',
     addWork: '/works/create',
+    getWorks: '/works/getData',
+    deleteWork: '/works/delete',
+    detailWork: '/works/getDetailWork',
+    updateWork: '/works/update',
 };

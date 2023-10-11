@@ -1,4 +1,3 @@
-import './fake-db';
 import { Provider } from 'react-redux';
 import { useRoutes } from 'react-router-dom';
 import { MatxTheme } from './components';

@@ -1,10 +1,20 @@
-import { Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, makeStyles, styled, tableCellClasses, useTheme } from '@mui/material';
+import { Box, Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, makeStyles, styled, tableCellClasses, useTheme } from '@mui/material';
 import ModalAddReport from 'components/ModalAddReport';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import RowCards from 'views/dashboard/shared/RowCards';
 import { useTranslation } from 'react-i18next';
 import { ConfirmationDialog } from 'components';
 import { getPercentNG } from 'components/ModalAddReport/modal_add_report.service';
+import restApi from 'utils/restAPI';
+import { RouteApi } from 'RouteApi';
+import NoData from 'components/NoData';
+import Loading from 'components/MatxLoading';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import Swal from 'sweetalert2';
+import { ShowQuestion, ShowAlert } from 'utils/confirm';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 // the hook
 
 
@@ -114,6 +124,22 @@ const HEAD_TABLE = [
     },
 ];
 
+const getNameShift = (shift) => {
+    let str = shift.trim().toLowerCase();
+    switch (str) {
+        case 'a':
+
+            return 'Day';
+        case 'b':
+
+            return 'Night';
+
+        default:
+            return '';
+    }
+}
+
+const ROWPERPAGE = [5, 10, 20]
 
 const DailyReport = () => {
 
@@ -121,43 +147,123 @@ const DailyReport = () => {
     const theme = useTheme();
     const [rowSelected, setRowSelected] = useState('');
     const { t, i18n } = useTranslation();
+    const [page, setPage] = useState(0);
+    const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
+    const [listWork, setListWork] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [dataMaster, setDataMaster] = useState({});
+    const [typeModal, setTypeModal] = useState('');
+    const [dataEdit, setDataEdit] = useState(null);
 
     const handleClickAdd = () => {
+        setTypeModal('ADD');
         setOpenModalAdd(true);
     }
 
+    const handleChangePage = (e, page) => {
+        setPage(page);
+    }
+
+    const getData = async () => {
+        setLoading(true);
+        const data = {
+            page,
+            rowPerpage
+        }
+        const response = await restApi.post(RouteApi.getWorks, data);
+        if (response?.status === 200) {
+            const data = response?.data;
+            setLoading(false);
+            setListWork(data);
+        } else {
+
+            setLoading(false);
+        }
+    }
+
+    const afterSaved = () => {
+
+        setRowSelected('');
+        getData();
+    }
+
+    const getDataMaster = async () => {
+        const response = await restApi.get(RouteApi.data_master);
+        if (response?.status === 200) {
+            setDataMaster(response?.data);
+        }
+    }
+
+    useEffect(() => {
+        getDataMaster();
+    }, [])
+    useEffect(() => {
+        getData();
+    }, [page, rowPerpage])
+
+    const handleChangeRowsPerPage = (e) => {
+        setRowPerpage(e.target.value);
+    }
 
     const handleCloseModalAdd = () => {
-
-
         setOpenModalAdd(false);
-    }
-    function createData(id, w, N, T, DAY, SHIFT, MODEL, COLOR, STAGE, QUANTITY, TOTAL_OK, TOTAL_NG, PERCENTAG_NG) {
-        return { id, w, N, T, DAY, SHIFT, MODEL, COLOR, STAGE, QUANTITY, TOTAL_OK, TOTAL_NG, PERCENTAG_NG };
+        setDataEdit(null);
     }
 
     const handleClickRow = (row) => {
         setRowSelected(row);
     }
+    const handleClickDelete = () => {
+        if (rowSelected) {
+            ShowQuestion({
+                content: 'Bạn chắc chắn muốn xóa ?',
+                icon: 'warning',
+                onClickYes: async () => {
+                    const response = await restApi.post(RouteApi.deleteWork, { id: rowSelected?.work_id });
+                    if (response?.status === 200) {
+                        ShowAlert({
+                            textProp: 'Xóa thành công!',
+                            onClose: getData
+                        });
+                    } else {
+                        ShowAlert({
+                            iconProp: 'warning',
+                            textProp: 'Xóa thất bại!',
+                        });
+                    }
+                }
+            });
+        }
+    }
 
-    const rows = [
-        createData(1, 37, 2023, 9, 13, 'DAY', 'DM3', 'GREEN', 'Ngoại quan mực', 2400, 1200, 200, 4.0),
-        createData(2, 37, 2023, 9, 13, 'NIGHT', 'DM3', 'GREEN', 'Ngoại quan mực', 3700, 1200, 200, 4.3),
-        createData(3, 37, 2023, 9, 13, 'DAY', 'Q5 Front', 'GREEN', 'Ngoại quan mực', 2400, 1200, 200, 6.0),
-        createData(4, 37, 2023, 9, 13, 'NIGHT', 'DM3', 'LAVENDER', 'Ngoại quan mực', 6700, 1200, 200, 4.3),
-        createData(5, 37, 2023, 9, 13, 'V5 CRD', 'DM3', 'GREEN', 'Ngoại quan mực', 4900, 1200, 200, 3.9),
-        createData(6, 37, 2023, 9, 13, 'DAY', 'DM3', 'BLACK', 'Ngoại quan mực', 4900, 1200, 200, 3.9),
-        createData(7, 37, 2023, 9, 13, 'DAY', 'Q5 Front', 'SAND', 'Ngoại quan mực', 4900, 1200, 200, 3.9),
-        createData(8, 37, 2023, 9, 13, 'DAY', 'DM3', 'GREEN', 'Ngoại quan mực', 4900, 1200, 200, 3.9),
-        createData(9, 37, 2023, 9, 13, 'V5 CRD', 'DM3', 'BLUE', 'Ngoại quan mực', 4900, 1200, 200, 3.9),
-        createData(10, 37, 2023, 9, 13, 'DAY', 'DM3', 'GREEN', 'Ngoại quan mực', 4900, 1200, 200, 3.9),
-    ];
+    const handleClickEdit = async () => {
+        setTypeModal('EDIT');
+        const data = { workId: rowSelected?.work_id, modelId: rowSelected?.model_id }
+        const res = await restApi.post(RouteApi.detailWork, data);
+        // console.log(res);
+        if (res?.status === 200) {
+            setDataEdit(res?.data);
+            setOpenModalAdd(true);
+
+        } else {
+            ShowAlert({
+                iconProp: 'warning',
+                textProp: 'Cannot edit!',
+            });
+        }
+    }
+    if (loading) return <Loading />;
     return (<>
         <ContentBox className="analytics">
             <Grid container spacing={3}>
 
                 <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }} item lg={12} md={12} sm={12} xs={12}>
-                    <Button variant="contained" onClick={handleClickAdd}>{t('btn-add-report')}</Button>
+                    <Button sx={{ marginRight: '5px' }} startIcon={<AddIcon />} variant="contained" onClick={handleClickAdd}>{t('btn-add-report')}</Button>
+                    <Button sx={{ marginRight: '15px' }} onClick={handleClickEdit} disabled={!rowSelected} startIcon={<EditIcon />} variant="contained">{t('btn-edit-report')}</Button>
+                    <Button sx={{ marginRight: '15px' }} onClick={handleClickEdit} disabled={!rowSelected} startIcon={<RemoveRedEyeIcon />} variant="contained">{t('btn-view-report')}</Button>
+                    <Button variant="contained" onClick={handleClickDelete} disabled={!rowSelected} size='small' startIcon={<DeleteIcon />}>
+                        {t('btn-delete-report')}
+                    </Button>
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -170,53 +276,54 @@ const DailyReport = () => {
                                         <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
                                 </TableRow>
                             </TableHead>
-                            <TableBody>
-                                {rows.map((row, index) => (
-                                    <StyledTableRow sx={{ cursor: 'pointer' }} onClick={() => { handleClickRow(row) }} selected={row?.id === rowSelected?.id} hover key={row.name}>
+                            {listWork?.length > 0 ? (<TableBody>
+
+                                {listWork.map((row, index) => (
+                                    <StyledTableRow sx={{ cursor: 'pointer' }} onClick={() => { handleClickRow(row) }} selected={row?.work_id === rowSelected?.work_id} hover key={row.work_id}>
                                         <StyledTableCell align='center'>
                                             {index + 1}
                                         </StyledTableCell>
                                         <StyledTableCell align='center'>
-                                            {row?.w}
+                                            {row?.week}
                                         </StyledTableCell>
                                         <StyledTableCell align='center'>
-                                            {row?.N}
+                                            {row?.year}
                                         </StyledTableCell>
                                         <StyledTableCell align='center'>
-                                            {row?.T}
+                                            {row?.month}
                                         </StyledTableCell>
                                         <StyledTableCell align='center'>
-                                            {row?.DAY}
+                                            {row?.day}
                                         </StyledTableCell>
                                         <StyledTableCell align='center'>
-                                            {row?.SHIFT}
+                                            {getNameShift(row?.shift)}
                                         </StyledTableCell>
-                                        <StyledTableCell align="left">{row?.MODEL}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.COLOR}</StyledTableCell>
-                                        <StyledTableCell align="left">{row?.STAGE}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.QUANTITY}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.TOTAL_OK}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.TOTAL_NG}</StyledTableCell>
-                                        <StyledTableCell align="center">{getPercentNG(row?.QUANTITY, row?.TOTAL_NG)}%</StyledTableCell>
+                                        <StyledTableCell align="left">{row?.model_name}</StyledTableCell>
+                                        <StyledTableCell align="center">{row?.color_name}</StyledTableCell>
+                                        <StyledTableCell align="left">{row?.stage_name}</StyledTableCell>
+                                        <StyledTableCell align="center">{row?.quantity}</StyledTableCell>
+                                        <StyledTableCell align="center">{row?.qtyOK}</StyledTableCell>
+                                        <StyledTableCell align="center">{row?.qtyNG}</StyledTableCell>
+                                        <StyledTableCell align="center">{getPercentNG(row?.quantity, row?.qtyNG)}%</StyledTableCell>
                                     </StyledTableRow>
                                 ))}
-                            </TableBody>
+                            </TableBody>) : (<NoData />)}
+
                         </Table>
                     </TableContainer>
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 100]}
+                    {listWork?.length > 0 && (<TablePagination
+                        rowsPerPageOptions={ROWPERPAGE}
                         component="div"
-                        count={rows.length}
-                        rowsPerPage={5}
-                    // page={page}
-                    // onPageChange={handleChangePage}
-                    // onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
+                        count={listWork.length}
+                        rowsPerPage={rowPerpage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />)}
                 </Grid>
             </Grid>
         </ContentBox >
-        <ConfirmationDialog open={false} text={'confirm text'} onYesClick={() => { console.log('onclickyes') }} />
-        <ModalAddReport open={openModalAdd} handleClose={handleCloseModalAdd} />
+        <ModalAddReport typeModal={typeModal} open={openModalAdd} rowSelected={dataEdit} dataMaster={dataMaster} handleClose={handleCloseModalAdd} afterSaved={afterSaved} />
     </>);
 
 }
