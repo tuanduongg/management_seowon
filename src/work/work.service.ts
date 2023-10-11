@@ -8,7 +8,7 @@ import { Time } from 'src/entity/time.entity';
 import { Work } from 'src/entity/work.entity';
 import { WorkModel } from 'src/entity/work_model.entity';
 import { WorkNG } from 'src/entity/work_ng.entity';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 
 @Injectable()
 export class WorkService {
@@ -29,6 +29,7 @@ export class WorkService {
     private modelRepo: Repository<Model>,
     @InjectRepository(WorkNG)
     private workNGRepo: Repository<WorkNG>,
+    private readonly entityManager: EntityManager,
   ) {}
 
   async createWork(body, request) {
@@ -43,7 +44,6 @@ export class WorkService {
       nameImporter,
       modelCode,
       stage,
-      color,
       machine,
       totalNG,
       totalOK,
@@ -51,8 +51,6 @@ export class WorkService {
       note,
       listNG,
     } = body;
-
-    console.log('shift', shift);
 
     const work_new = new Work();
     work_new.day = parseInt(day);
@@ -76,15 +74,14 @@ export class WorkService {
       work_model.qtyNG = totalNG;
       work_model.stageId = stage.value;
       work_model.workId = work.work_id;
-      work_model.colorID = color.value;
       const newWorkModel = this.workModelRepo.create(work_model);
       const workModel = await this.workModelRepo.save(newWorkModel);
       if (listNG?.length > 0) {
         const arrNG = [];
         listNG.map((item) => {
           const newNg = new WorkNG();
-          newNg.NG_name = item?.name;
-          newNg.total = item?.totalNG;
+          newNg.NG_name = item?.NG_name;
+          newNg.total = item?.total;
           newNg.modelId = modelCode.value;
           newNg.workId = work.work_id;
           arrNG.push(newNg);
@@ -136,7 +133,12 @@ export class WorkService {
       .getMany();
     const modelsPromise = this.modelRepo
       .createQueryBuilder('model')
-      .select(['model.model_id', 'model.model_code', 'model.model_name'])
+      .select([
+        'model.model_id',
+        'model.model_code',
+        'model.model_name',
+        'model.colorId',
+      ])
       .where('model.delete_at IS NULL')
       .getMany();
 
@@ -155,5 +157,118 @@ export class WorkService {
       stages,
       models,
     };
+  }
+
+  async getData(body) {
+    let { page, rowPerpage } = body;
+    if (!page) {
+      page = 0;
+    }
+    if (!rowPerpage) {
+      rowPerpage = 20;
+    }
+    const query = `select work.work_id,work.week,work.day,work.month,work.year,work.shift,work.created_at,department.department_name,DataSelect.*
+    from work
+    left join department on department.department_id = work.department_id
+    inner join  (select work_model.*,ModelSelect.*,stage.stage_name from work_model
+    inner join stage on stage.stage_id = work_model.stageId
+    inner join (select model.model_id,model.model_name,model.model_code,color.color_name from model inner join color on color.color_id = model.colorId) as ModelSelect  on ModelSelect.model_id = work_model.modelId) as DataSelect 
+    on DataSelect.workId = work.work_id
+    WHERE work.delete_at is NULL
+    ORDER BY work.created_at DESC
+    OFFSET ${page} ROWS FETCH NEXT ${rowPerpage} ROWS ONLY;`;
+    // const queryCount = `select COUNT(*) as total from work
+    // where delete_at IS NULL;`;
+    const data = await this.entityManager.query(query);
+    // const data = await this.entityManager.query(query);
+    // console.log('dataa', data);
+    // const queryCout = `select COUNT(*) as total from work
+    // where delete_at IS NULL`;
+
+    return data;
+  }
+  async delete(id, request) {
+    const data = await this.workRepo.save({
+      work_id: id,
+      deleted_by: request?.user?.username ?? '',
+      delete_at: new Date(),
+    });
+    return data;
+  }
+  async getDetailWork(workId, modelId) {
+    const query = `select work.* ,work_model.* from work
+    left join work_model on work.work_id = work_model.workId
+    where work.work_id = '${workId}'`;
+    const dataWork = await this.entityManager.query(query);
+    // const workModel = await this.workModelRepo.findOne({
+    //   where: { workId: id },
+    // });
+    // return { dataWork, workModel };
+    const work = dataWork[0] ?? {};
+    const workNG = await this.workNGRepo.find({ where: { workId, modelId } });
+    return { work, workNG };
+  }
+
+  async update(body, request) {
+    const {
+      shift,
+      time,
+      week,
+      day,
+      month,
+      year,
+      department,
+      nameImporter,
+      modelCode,
+      stage,
+      machine,
+      totalNG,
+      totalOK,
+      quantity,
+      note,
+      listNG,
+      work_id,
+      modelId,
+      workModelID,
+    } = body;
+    const work = await this.workRepo.save({
+      work_id: work_id,
+      shift,
+      day,
+      month,
+      year,
+      week,
+      time_id: time,
+      department_id: department,
+      importer: nameImporter,
+      note,
+      updated_by: request?.user?.username ?? '',
+      update_at: new Date(),
+    });
+    const workModel = await this.workModelRepo.save({
+      modelId: modelCode.value,
+      id: workModelID,
+      workId: work_id,
+      stageId: stage.value,
+      quantity: quantity,
+      qtyOK: totalOK,
+      qtyNG: totalNG,
+      machine,
+    });
+    const arrNG = [];
+    const data = await this.workNGRepo.delete({
+      workId: work_id,
+      modelId: modelId,
+    });
+    listNG.map((item) => {
+      const newNg = new WorkNG();
+      newNg.NG_name = item?.NG_name;
+      newNg.total = item?.total;
+      newNg.modelId = modelCode.value;
+      newNg.workId = work_id;
+      arrNG.push(newNg);
+    });
+    const workNG = await this.workNGRepo.insert(arrNG);
+    return { workModel, work };
   }
 }

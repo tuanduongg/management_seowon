@@ -19,6 +19,4 @@ export class WorkModel {
   qtyNG: number;
   @Column()
   machine: string;
-  @Column()
-  colorID: number;
 }
