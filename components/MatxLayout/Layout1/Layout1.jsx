@@ -47,6 +47,11 @@ const LayoutContainer = styled(Box)(({ width, secondarySidebar }) => ({
   marginRight: secondarySidebar.open ? 50 : 0,
 }));
 
+const ContentBoxCustom = styled('div')(({ theme }) => ({
+  margin: '30px',
+  [theme.breakpoints.down('sm')]: { margin: '16px' },
+}));
+
 const Layout1 = () => {
   const { settings, updateSettings } = useSettings();
   const { layout1Settings, secondarySidebar } = settings;
@@ -127,7 +132,9 @@ const Layout1 = () => {
 
             <Box flexGrow={1} position="relative">
               <MatxSuspense>
-                <Outlet />
+                <ContentBoxCustom>
+                  <Outlet />
+                </ContentBoxCustom>
               </MatxSuspense>
             </Box>
 

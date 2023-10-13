@@ -61,6 +61,18 @@ const QuillEditor = ({ data, setData }) => {
                 image: imageHandler
             }
         }
+        , clipboard: {
+            // toggle to add extra line breaks when pasting HTML:
+            matchVisual: false,
+        }
+    };
+    const isBase64Image = (str) => {
+        const base64Regex = /^data:image\/(jpeg|jpg|gif|png|svg);base64,/;
+        return base64Regex.test(str);
+    };
+    const isImageUrl = (url) => {
+        const imageRegex = /\.(jpeg|jpg|gif|png|svg)$/i;
+        return imageRegex.test(url);
     };
 
     return (

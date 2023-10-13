@@ -52,3 +52,5 @@ export function isPositiveInteger(number) {
     // Check if the number is a positive integer
     return Number.isInteger(number) && number >= 0;
 }
+
+export const ARRYEAR = Array.from({ length: 19 }, (_, i) => new Date().getFullYear() - i);

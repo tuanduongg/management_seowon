@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close'
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
-import { getCurrentWeek, checkShift, getPercentNG, isPositiveInteger } from "./modal_add_report.service";
+import { getCurrentWeek, checkShift, getPercentNG, isPositiveInteger, ARRYEAR } from "./modal_add_report.service";
 import ModalAddModel from "components/ModalAddModel";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -41,7 +41,7 @@ const SHIFT = [
     }
 ];
 
-const ARRYEAR = Array.from({ length: 19 }, (_, i) => new Date().getFullYear() - i);;
+
 // for (let index = new Date().getFullYear(); index <= 2010; index--) {
 //     ARRYEAR.push(index);
 // }

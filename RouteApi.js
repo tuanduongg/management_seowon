@@ -8,4 +8,5 @@ export const RouteApi = {
     deleteWork: '/works/delete',
     detailWork: '/works/getDetailWork',
     updateWork: '/works/update',
+    uploadImageEditor: '/works/uploadImageEditor',
 };

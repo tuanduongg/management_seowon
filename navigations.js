@@ -8,7 +8,10 @@ export const navigations = [
     icon: 'assessment',
     children: [
       { name: 'sidebar-report', path: ConfigRouter.home, icon: 'assessment' },
-      { name: 'model', icon: 'circle', path: ConfigRouter.signup },
+      { name: 'model', icon: 'attachment', path: ConfigRouter.model },
+      { name: 'time', icon: 'timer', path: ConfigRouter.time },
+      { name: 'department', icon: 'ballot', path: ConfigRouter.department },
+      { name: 'stage', icon: 'checklistrtl', path: ConfigRouter.stage },
     ],
   },
   // { label: 'Components', type: 'label' },

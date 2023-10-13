@@ -1,10 +1,10 @@
-import { Box, Button, Card, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, makeStyles, styled, tableCellClasses, useTheme } from '@mui/material';
+import { Box, Button, Card, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, makeStyles, styled, tableCellClasses, useTheme } from '@mui/material';
 import ModalAddReport from 'components/ModalAddReport';
 import { Fragment, useEffect, useState } from 'react';
 import RowCards from 'views/dashboard/shared/RowCards';
 import { useTranslation } from 'react-i18next';
 import { ConfirmationDialog } from 'components';
-import { getPercentNG } from 'components/ModalAddReport/modal_add_report.service';
+import { ARRYEAR, getPercentNG } from 'components/ModalAddReport/modal_add_report.service';
 import restApi from 'utils/restAPI';
 import { RouteApi } from 'RouteApi';
 import NoData from 'components/NoData';
@@ -12,9 +12,11 @@ import Loading from 'components/MatxLoading';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import Swal from 'sweetalert2';
-import { ShowQuestion, ShowAlert } from 'utils/confirm';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import Swal from 'sweetalert2';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { ShowQuestion, ShowAlert } from 'utils/confirm';
+import ClearIcon from '@mui/icons-material/Clear';
 // the hook
 
 
@@ -93,6 +95,11 @@ const HEAD_TABLE = [
         // with: '100px',
     },
     {
+        title: 'Time',
+        with: '100px',
+        align: 'center'
+    },
+    {
         title: 'Model(모델)',
         align: 'left',
         with: '150px',
@@ -100,6 +107,11 @@ const HEAD_TABLE = [
     {
         title: 'Color(색상)',
         align: 'center'
+    },
+    {
+        title: 'Department(부서)',
+        align: 'left',
+        with: '150px',
     },
     {
         title: 'Stage(공정)',
@@ -139,7 +151,16 @@ const getNameShift = (shift) => {
     }
 }
 
-const ROWPERPAGE = [5, 10, 20]
+const ROWPERPAGE = [5, 10, 20];
+const ALL = 'All';
+
+const MenuProps = {
+    sx: {
+        "&& .Mui-selected": {
+            backgroundColor: "#bdbdbd"
+        }
+    }
+};
 
 const DailyReport = () => {
 
@@ -154,6 +175,15 @@ const DailyReport = () => {
     const [dataMaster, setDataMaster] = useState({});
     const [typeModal, setTypeModal] = useState('');
     const [dataEdit, setDataEdit] = useState(null);
+    const [week, setWeek] = useState(ALL);
+    const [day, setDay] = useState(ALL);
+    const [month, setMonth] = useState(ALL);
+    const [year, setYear] = useState(ALL);
+    const [model, setModel] = useState(ALL);
+    const [department, setDepartment] = useState(ALL);
+    const [listDepartment, setListDepartment] = useState([]);
+    const [listModel, setListModel] = useState([]);
+
 
     const handleClickAdd = () => {
         setTypeModal('ADD');
@@ -182,7 +212,6 @@ const DailyReport = () => {
     }
 
     const afterSaved = () => {
-
         setRowSelected('');
         getData();
     }
@@ -191,6 +220,9 @@ const DailyReport = () => {
         const response = await restApi.get(RouteApi.data_master);
         if (response?.status === 200) {
             setDataMaster(response?.data);
+            const { departments, models, stages, times } = response?.data;
+            setListDepartment(departments);
+            setListModel(models);
         }
     }
 
@@ -254,75 +286,190 @@ const DailyReport = () => {
     }
     if (loading) return <Loading />;
     return (<>
-        <ContentBox className="analytics">
-            <Grid container spacing={3}>
+        <Grid container spacing={3}>
 
-                <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }} item lg={12} md={12} sm={12} xs={12}>
+            <Grid sx={{ display: 'flex', }} item lg={12} md={12} sm={12} xs={12}>
+                <Box sx={{ display: 'flex' }}>
+                    <FormControl size='small'>
+                        <InputLabel id="demo-simple-select-label">W(주차)</InputLabel>
+                        <Select sx={{ minWidth: '100px', marginRight: '5px' }}
+                            MenuProps={MenuProps}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="W(주차)"
+                            value={week}
+                            onChange={(e) => { setWeek(e.target.value) }}
+                        >
+                            <MenuItem value={ALL}>{ALL}</MenuItem>
+                            {[...Array(52).keys()].map((item) =>
+                                (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size='small'>
+                        <InputLabel id="demo-simple-select-label">N(년)</InputLabel>
+                        <Select sx={{ minWidth: '100px', marginRight: '5px' }}
+                            MenuProps={MenuProps}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="N(년)"
+                            value={year}
+                            onChange={(e) => { setYear(e.target.value) }}
+
+                        >
+                            <MenuItem value={ALL}>{ALL}</MenuItem>
+                            {ARRYEAR.map((item, index) =>
+                                (<MenuItem key={item} value={item}>{item}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size='small'>
+                        <InputLabel id="demo-simple-select-label">T(월)</InputLabel>
+                        <Select sx={{ minWidth: '100px', marginRight: '5px' }}
+                            MenuProps={MenuProps}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="T(월)"
+                            value={month}
+                            onChange={(e) => { setMonth(e.target.value) }}
+
+                        >
+                            <MenuItem value={ALL}>{ALL}</MenuItem>
+                            {[...Array(12).keys()].map((item) =>
+                                (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size='small'>
+                        <InputLabel id="demo-simple-select-label">N(일)</InputLabel>
+                        <Select sx={{ minWidth: '100px', marginRight: '5px' }}
+                            MenuProps={MenuProps}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="N(일)"
+                            value={day}
+                            onChange={(e) => { setDay(e.target.value) }}
+
+                        >
+                            <MenuItem value={ALL}>{ALL}</MenuItem>
+                            {[...Array(31).keys()].map((item) =>
+                                (<MenuItem key={item + 1} value={item + 1}>{item + 1}</MenuItem>))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size='small'>
+                        <InputLabel id="demo-simple-select-label">Department(부서)</InputLabel>
+                        <Select sx={{ minWidth: '150px', marginRight: '5px' }}
+                            MenuProps={MenuProps}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="Department(부서)"
+                            value={department}
+                            onChange={(e) => { setDepartment(e.target.value) }}
+
+                        >
+                            <MenuItem value={ALL}>{ALL}</MenuItem>
+                            {listDepartment?.map((item, index) => (
+                                <MenuItem value={item?.department_id}>{item?.department_name}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl size='small'>
+                        <InputLabel id="demo-simple-select-label">Model(모델)</InputLabel>
+                        <Select sx={{ minWidth: '120px', marginRight: '5px' }}
+                            MenuProps={MenuProps}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="Model(모델)"
+                            value={model}
+                            onChange={(e) => { setModel(e.target.value) }}
+
+                        >
+                            <MenuItem value={ALL}>{ALL}</MenuItem>
+                            {listModel?.map((item, index) => (
+                                <MenuItem value={item?.model_id}>{item?.model_name} - {item?.model_code} </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <Button sx={{ '& .MuiButton-endIcon ': { margin: '0px' }, marginRight: '15px' }} variant="outlined" endIcon={<ClearIcon />} aria-label="delete">
+
+                    </Button>
+                    <Button sx={{ '& .MuiButton-endIcon ': { margin: '0px' } }} variant="contained" endIcon={<FilterAltIcon />} aria-label="delete">
+
+                    </Button>
+                </Box>
+            </Grid>
+            <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }} item lg={12} md={12} sm={12} xs={12}>
+                <Box sx={{ display: 'flex' }}>
+
                     <Button sx={{ marginRight: '5px' }} startIcon={<AddIcon />} variant="contained" onClick={handleClickAdd}>{t('btn-add-report')}</Button>
                     <Button sx={{ marginRight: '15px' }} onClick={handleClickEdit} disabled={!rowSelected} startIcon={<EditIcon />} variant="contained">{t('btn-edit-report')}</Button>
                     <Button sx={{ marginRight: '15px' }} onClick={handleClickEdit} disabled={!rowSelected} startIcon={<RemoveRedEyeIcon />} variant="contained">{t('btn-view-report')}</Button>
                     <Button variant="contained" onClick={handleClickDelete} disabled={!rowSelected} size='small' startIcon={<DeleteIcon />}>
                         {t('btn-delete-report')}
                     </Button>
-                </Grid>
-
-                <Grid item lg={12} md={12} sm={12} xs={12}>
-                    <H4>Báo cáo hằng ngày</H4>
-                    <TableContainer sx={{ backgroundColor: '#e3e3e3ed' }}>
-                        <Table stickyHeader aria-label="customized table">
-                            <TableHead>
-                                <TableRow>
-                                    {HEAD_TABLE.map((item, index) => (
-                                        <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
-                                </TableRow>
-                            </TableHead>
-                            {listWork?.length > 0 ? (<TableBody>
-
-                                {listWork.map((row, index) => (
-                                    <StyledTableRow sx={{ cursor: 'pointer' }} onClick={() => { handleClickRow(row) }} selected={row?.work_id === rowSelected?.work_id} hover key={row.work_id}>
-                                        <StyledTableCell align='center'>
-                                            {index + 1}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='center'>
-                                            {row?.week}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='center'>
-                                            {row?.year}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='center'>
-                                            {row?.month}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='center'>
-                                            {row?.day}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='center'>
-                                            {getNameShift(row?.shift)}
-                                        </StyledTableCell>
-                                        <StyledTableCell align="left">{row?.model_name}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.color_name}</StyledTableCell>
-                                        <StyledTableCell align="left">{row?.stage_name}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.quantity}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.qtyOK}</StyledTableCell>
-                                        <StyledTableCell align="center">{row?.qtyNG}</StyledTableCell>
-                                        <StyledTableCell align="center">{getPercentNG(row?.quantity, row?.qtyNG)}%</StyledTableCell>
-                                    </StyledTableRow>
-                                ))}
-                            </TableBody>) : (<NoData />)}
-
-                        </Table>
-                    </TableContainer>
-                    {listWork?.length > 0 && (<TablePagination
-                        rowsPerPageOptions={ROWPERPAGE}
-                        component="div"
-                        count={listWork.length}
-                        rowsPerPage={rowPerpage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />)}
-                </Grid>
+                </Box>
             </Grid>
-        </ContentBox >
+
+            <Grid item lg={12} md={12} sm={12} xs={12}>
+                <H4>Báo cáo hằng ngày</H4>
+                <TableContainer sx={{ backgroundColor: '#e3e3e3ed' }}>
+                    <Table stickyHeader aria-label="customized table">
+                        <TableHead>
+                            <TableRow>
+                                {HEAD_TABLE.map((item, index) => (
+                                    <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
+                            </TableRow>
+                        </TableHead>
+                        {listWork?.length > 0 ? (<TableBody>
+
+                            {listWork.map((row, index) => (
+                                <StyledTableRow sx={{ cursor: 'pointer' }} onClick={() => { handleClickRow(row) }} selected={row?.work_id === rowSelected?.work_id} hover key={row.work_id}>
+                                    <StyledTableCell align='center'>
+                                        {index + 1}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='center'>
+                                        {row?.week}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='center'>
+                                        {row?.year}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='center'>
+                                        {row?.month}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='center'>
+                                        {row?.day}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='center'>
+                                        {getNameShift(row?.shift)}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='center'>
+                                        A
+                                    </StyledTableCell>
+                                    <StyledTableCell align="left">{row?.model_name}</StyledTableCell>
+                                    <StyledTableCell align="center">{row?.color_name}</StyledTableCell>
+                                    <StyledTableCell align="left">{row?.department_name}</StyledTableCell>
+                                    <StyledTableCell align="left">{row?.stage_name}</StyledTableCell>
+                                    <StyledTableCell align="center">{row?.quantity}</StyledTableCell>
+                                    <StyledTableCell align="center">{row?.qtyOK}</StyledTableCell>
+                                    <StyledTableCell align="center">{row?.qtyNG}</StyledTableCell>
+                                    <StyledTableCell align="center">{getPercentNG(row?.quantity, row?.qtyNG)}%</StyledTableCell>
+                                </StyledTableRow>
+                            ))}
+                        </TableBody>) : (<NoData />)}
+
+                    </Table>
+                </TableContainer>
+                {listWork?.length > 0 && (<TablePagination
+                    rowsPerPageOptions={ROWPERPAGE}
+                    component="div"
+                    count={listWork.length}
+                    rowsPerPage={rowPerpage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />)}
+            </Grid>
+        </Grid>
+        {/* <ContentBox className="analytics">
+        </ContentBox > */}
         <ModalAddReport typeModal={typeModal} open={openModalAdd} rowSelected={dataEdit} dataMaster={dataMaster} handleClose={handleCloseModalAdd} afterSaved={afterSaved} />
     </>);
 

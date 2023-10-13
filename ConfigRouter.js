@@ -5,6 +5,9 @@ export const ConfigRouter = {
   notfound: '/404',
   signup: '/signup',
   model: '/model',
+  time: '/time',
+  department: '/department',
+  stage: '/stage',
 
   home: '/',
 };
