@@ -70,7 +70,7 @@ export class WorkController {
       .send({ message: 'cannot add new' });
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('/getData')
   async getData(@Req() request: Request, @Res() res: Response, @Body() body) {
     console.log('body', body);
@@ -133,7 +133,27 @@ export class WorkController {
     const data = body?.data;
     const dataObj = JSON.parse(data);
     const { work_id,modelId } = dataObj;
-    console.log('dataObj',dataObj);
+    if (work_id && modelId) {
+      const data = await this.workService.update(dataObj,request);
+      if (data) {
+        return res.status(HttpStatus.CREATED).send(data);
+      }
+    }
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send({ message: 'Cannot update!' });
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/uploadImageEditor')
+  async uploadImageEditor(
+    @Req() request: Request,
+    @Res() res: Response,
+    @Body() body,
+  ) {
+    const data = body?.data;
+    const dataObj = JSON.parse(data);
+    const { work_id,modelId } = dataObj;
     if (work_id && modelId) {
       const data = await this.workService.update(dataObj,request);
       if (data) {

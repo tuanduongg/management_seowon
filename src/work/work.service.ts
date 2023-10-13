@@ -160,32 +160,45 @@ export class WorkService {
   }
 
   async getData(body) {
-    let { page, rowPerpage } = body;
-    if (!page) {
-      page = 0;
-    }
-    if (!rowPerpage) {
-      rowPerpage = 20;
-    }
-    const query = `select work.work_id,work.week,work.day,work.month,work.year,work.shift,work.created_at,department.department_name,DataSelect.*
-    from work
-    left join department on department.department_id = work.department_id
-    inner join  (select work_model.*,ModelSelect.*,stage.stage_name from work_model
-    inner join stage on stage.stage_id = work_model.stageId
-    inner join (select model.model_id,model.model_name,model.model_code,color.color_name from model inner join color on color.color_id = model.colorId) as ModelSelect  on ModelSelect.model_id = work_model.modelId) as DataSelect 
-    on DataSelect.workId = work.work_id
-    WHERE work.delete_at is NULL
-    ORDER BY work.created_at DESC
-    OFFSET ${page} ROWS FETCH NEXT ${rowPerpage} ROWS ONLY;`;
-    // const queryCount = `select COUNT(*) as total from work
-    // where delete_at IS NULL;`;
-    const data = await this.entityManager.query(query);
-    // const data = await this.entityManager.query(query);
-    // console.log('dataa', data);
-    // const queryCout = `select COUNT(*) as total from work
-    // where delete_at IS NULL`;
+    const take = body.rowPerpage || 1;
+    const skip = body.page || 1;
 
-    return data;
+    const [result, total] = await this.workRepo.findAndCount({
+      order: { created_at: 'DESC' },
+      take: take,
+      skip: skip,
+    });
+
+    return {
+      data: result,
+      count: total,
+    };
+    // let { page, rowPerpage } = body;
+    // if (!page) {
+    //   page = 0;
+    // }
+    // if (!rowPerpage) {
+    //   rowPerpage = 20;
+    // }
+    // const query = `select work.work_id,work.week,work.day,work.month,work.year,work.shift,work.created_at,department.department_name,DataSelect.*
+    // from work
+    // left join department on department.department_id = work.department_id
+    // inner join  (select work_model.*,ModelSelect.*,stage.stage_name from work_model
+    // inner join stage on stage.stage_id = work_model.stageId
+    // inner join (select model.model_id,model.model_name,model.model_code,color.color_name from model inner join color on color.color_id = model.colorId) as ModelSelect  on ModelSelect.model_id = work_model.modelId) as DataSelect
+    // on DataSelect.workId = work.work_id
+    // WHERE work.delete_at is NULL
+    // ORDER BY work.created_at DESC
+    // OFFSET ${page} ROWS FETCH NEXT ${rowPerpage} ROWS ONLY;`;
+    // // const queryCount = `select COUNT(*) as total from work
+    // // where delete_at IS NULL;`;
+    // const data = await this.entityManager.query(query);
+    // // const data = await this.entityManager.query(query);
+    // // console.log('dataa', data);
+    // // const queryCout = `select COUNT(*) as total from work
+    // // where delete_at IS NULL`;
+
+    // return data;
   }
   async delete(id, request) {
     const data = await this.workRepo.save({
@@ -270,5 +283,9 @@ export class WorkService {
     });
     const workNG = await this.workNGRepo.insert(arrNG);
     return { workModel, work };
+  }
+
+  async uploadImageEditor() {
+    return 1;
   }
 }
