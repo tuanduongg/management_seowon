@@ -16,7 +16,7 @@ export class Work {
   @Column({ nullable: true })
   week: number;
   @Column({ nullable: true })
-  time_id: number;
+  time: string;
   @Column({ nullable: true })
   department_id: number;
   @Column({ nullable: true })

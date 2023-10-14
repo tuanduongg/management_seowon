@@ -73,7 +73,6 @@ export class WorkController {
   // @UseGuards(AuthGuard)
   @Post('/getData')
   async getData(@Req() request: Request, @Res() res: Response, @Body() body) {
-    console.log('body', body);
     const data = await this.workService.getData(body);
     if (data) {
       return res.status(HttpStatus.OK).send(data);

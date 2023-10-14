@@ -5,12 +5,12 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 export class Model {
   @PrimaryGeneratedColumn()
   model_id: number;
-  @Column()
+  @Column({ unique: true })
   model_code: string;
   @Column()
   model_name: string;
-  @Column()
-  colorId: number;
+  @Column({ nullable: true })
+  color: string;
 
   @CreateDateColumn({ type: 'datetime' })
   created_at: Date;

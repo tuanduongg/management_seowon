@@ -12,6 +12,7 @@ import { Repository, EntityManager } from 'typeorm';
 
 @Injectable()
 export class WorkService {
+  private ALL;
   constructor(
     @InjectRepository(Work)
     private workRepo: Repository<Work>,
@@ -30,7 +31,9 @@ export class WorkService {
     @InjectRepository(WorkNG)
     private workNGRepo: Repository<WorkNG>,
     private readonly entityManager: EntityManager,
-  ) {}
+  ) {
+    this.ALL = 'ALL';
+  }
 
   async createWork(body, request) {
     const {
@@ -52,12 +55,14 @@ export class WorkService {
       listNG,
     } = body;
 
+    console.log(body);
+
     const work_new = new Work();
     work_new.day = parseInt(day);
     work_new.month = parseInt(month);
     work_new.shift = shift;
     work_new.week = parseInt(week);
-    work_new.time_id = parseInt(time);
+    work_new.time = time;
     work_new.importer = nameImporter;
     work_new.year = parseInt(year);
     work_new.department_id = parseInt(department);
@@ -137,7 +142,7 @@ export class WorkService {
         'model.model_id',
         'model.model_code',
         'model.model_name',
-        'model.colorId',
+        'model.color',
       ])
       .where('model.delete_at IS NULL')
       .getMany();
@@ -160,26 +165,67 @@ export class WorkService {
   }
 
   async getData(body) {
-    const take = body.rowPerpage || 1;
-    const skip = body.page || 1;
-
-    const [result, total] = await this.workRepo.findAndCount({
-      order: { created_at: 'DESC' },
-      take: take,
-      skip: skip,
-    });
-
-    return {
-      data: result,
-      count: total,
-    };
-    // let { page, rowPerpage } = body;
-    // if (!page) {
-    //   page = 0;
+    const { page, rowPerpage, week, day, month, year, model, department } =
+      body;
+    const take = rowPerpage || 10; // số bản ghi cần lấy
+    const skip = page ? parseInt(page) * parseInt(take) : 0; // vị trí
+    // const [result, total] = await this.workRepo.findAndCount({
+    //   where: { delete_at: null },
+    //   order: { created_at: 'DESC' },
+    //   take: take,
+    //   skip: skip,
+    // });;
     // }
-    // if (!rowPerpage) {
-    //   rowPerpage = 20;
-    // }
+    let weekStr = '';
+    if (week && week !== 'ALL') {
+      weekStr = ` AND work.week = ${week}`;
+    }
+    let dayStr = '';
+    if (day && day !== 'ALL') {
+      dayStr = ` AND work.day = ${day}`;
+    }
+    let monthStr = '';
+    if (month && month !== 'ALL') {
+      monthStr = ` AND work.month = ${month}`;
+    }
+    let yearStr = '';
+    if (year && year !== 'ALL') {
+      yearStr = ` AND work.year = ${year}`;
+    }
+    let modelStr = '';
+    if (model && model !== 'ALL') {
+      modelStr = ` where work_model.modelId = ${model}`;
+    }
+    let departStr = '';
+    if (department && department !== 'ALL') {
+      departStr = ` and  work.department_id = ${department}`;
+    }
+    const startQuery = `SELECT work.work_id, work.week, work.day, work.month, work.year, work.shift,work.time, department.department_name, DataSelect.*
+    FROM work`;
+    const startCountQuery = `SELECT COUNT(*) AS total_count
+    FROM work `;
+    const subQuery = ` LEFT JOIN department ON department.department_id = work.department_id
+    INNER JOIN (
+        SELECT work_model.quantity,work_model.qtyNG,work_model.qtyOK,work_model.workId, ModelSelect.*, stage.stage_name
+        FROM work_model
+        INNER JOIN stage ON stage.stage_id = work_model.stageId
+        INNER JOIN (
+            SELECT model.model_id, model.model_name, model.model_code, model.color
+            FROM model
+        ) AS ModelSelect ON ModelSelect.model_id = work_model.modelId${modelStr}
+    ) AS DataSelect ON DataSelect.workId = work.work_id
+    WHERE work.delete_at IS NULL ${weekStr}${dayStr}${monthStr}${yearStr}${departStr}`;
+    const endQuery = ` ORDER BY work.created_at DESC
+  OFFSET ${skip} ROWS FETCH NEXT ${take} ROWS ONLY;`;
+
+    const query = startQuery + subQuery + endQuery;
+    const countQuery = startCountQuery + subQuery;
+
+    const rsQuery = query.replaceAll('\n', '');
+    const rsCoutQuery = countQuery.replaceAll('\n', '');
+
+    // return { rsQuery, rsCoutQuery };
+
     // const query = `select work.work_id,work.week,work.day,work.month,work.year,work.shift,work.created_at,department.department_name,DataSelect.*
     // from work
     // left join department on department.department_id = work.department_id
@@ -190,11 +236,14 @@ export class WorkService {
     // WHERE work.delete_at is NULL
     // ORDER BY work.created_at DESC
     // OFFSET ${page} ROWS FETCH NEXT ${rowPerpage} ROWS ONLY;`;
-    // // const queryCount = `select COUNT(*) as total from work
-    // // where delete_at IS NULL;`;
+    // const queryCount = `select COUNT(*) as total from work
+    // where delete_at IS NULL;`;
+    // return { rsQuery, rsCoutQuery };
+    const data = await this.entityManager.query(rsQuery);
+    const dataCount = await this.entityManager.query(rsCoutQuery);
+    return { data: data, count: dataCount[0]?.total_count ?? 0 };
     // const data = await this.entityManager.query(query);
-    // // const data = await this.entityManager.query(query);
-    // // console.log('dataa', data);
+    // console.log('dataa', data);
     // // const queryCout = `select COUNT(*) as total from work
     // // where delete_at IS NULL`;
 

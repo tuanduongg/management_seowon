@@ -10,6 +10,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 import { WorkModule } from './work/work.module';
+import { ColorModule } from './color/color.module';
+import { ModelModule } from './model/model.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { WorkModule } from './work/work.module';
     DepartmentModule,
     AuthModule,
     WorkModule,
+    ColorModule,
+    ModelModule,
   ],
   controllers: [AppController],
   providers: [AppService],
