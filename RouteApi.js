@@ -9,4 +9,7 @@ export const RouteApi = {
     detailWork: '/works/getDetailWork',
     updateWork: '/works/update',
     uploadImageEditor: '/works/uploadImageEditor',
+    getColors: 'color/colors',
+    addModel: 'model/add',
+    getModels: 'model/getAll',
 };

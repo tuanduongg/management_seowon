@@ -152,7 +152,7 @@ const getNameShift = (shift) => {
 }
 
 const ROWPERPAGE = [5, 10, 20];
-const ALL = 'All';
+const ALL = 'ALL';
 
 const MenuProps = {
     sx: {
@@ -183,6 +183,7 @@ const DailyReport = () => {
     const [department, setDepartment] = useState(ALL);
     const [listDepartment, setListDepartment] = useState([]);
     const [listModel, setListModel] = useState([]);
+    const [total, setTotal] = useState(0);
 
 
     const handleClickAdd = () => {
@@ -194,17 +195,31 @@ const DailyReport = () => {
         setPage(page);
     }
 
-    const getData = async () => {
+    const getData = async (dataProp) => {
+
         setLoading(true);
-        const data = {
-            page,
-            rowPerpage
+        let data = null;
+        if (dataProp) {
+            data = dataProp;
+        } else {
+            data = {
+                page,
+                rowPerpage,
+                week,
+                day,
+                month,
+                year,
+                model,
+                department,
+            }
         }
         const response = await restApi.post(RouteApi.getWorks, data);
         if (response?.status === 200) {
             const data = response?.data;
+            console.log('data', data);
             setLoading(false);
-            setListWork(data);
+            setListWork(response?.data?.data);
+            setTotal(response?.data?.count);
         } else {
 
             setLoading(false);
@@ -234,6 +249,7 @@ const DailyReport = () => {
     }, [page, rowPerpage])
 
     const handleChangeRowsPerPage = (e) => {
+        setPage(0);
         setRowPerpage(e.target.value);
     }
 
@@ -268,8 +284,7 @@ const DailyReport = () => {
         }
     }
 
-    const handleClickEdit = async () => {
-        setTypeModal('EDIT');
+    const getDetailWork = async () => {
         const data = { workId: rowSelected?.work_id, modelId: rowSelected?.model_id }
         const res = await restApi.post(RouteApi.detailWork, data);
         // console.log(res);
@@ -283,6 +298,37 @@ const DailyReport = () => {
                 textProp: 'Cannot edit!',
             });
         }
+    }
+    const handleClickEdit = async () => {
+        setTypeModal('EDIT');
+        getDetailWork();
+    }
+
+    const handleClickView = async () => {
+        setTypeModal('VIEW');
+        getDetailWork();
+    }
+
+    const hanldeClickFilter = () => {
+        getData();
+    }
+    const handleClearFilter = () => {
+        setWeek(ALL);
+        setDay(ALL);
+        setMonth(ALL);
+        setYear(ALL);
+        setModel(ALL);
+        setDepartment(ALL);
+        getData({
+            page,
+            rowPerpage,
+            week: ALL,
+            day: ALL,
+            month: ALL,
+            year: ALL,
+            model: ALL,
+            department: ALL,
+        });
     }
     if (loading) return <Loading />;
     return (<>
@@ -388,10 +434,10 @@ const DailyReport = () => {
                         </Select>
                     </FormControl>
 
-                    <Button sx={{ '& .MuiButton-endIcon ': { margin: '0px' }, marginRight: '15px' }} variant="outlined" endIcon={<ClearIcon />} aria-label="delete">
+                    <Button sx={{ '& .MuiButton-endIcon ': { margin: '0px' }, marginRight: '15px' }} onClick={handleClearFilter} variant="outlined" endIcon={<ClearIcon />} aria-label="delete">
 
                     </Button>
-                    <Button sx={{ '& .MuiButton-endIcon ': { margin: '0px' } }} variant="contained" endIcon={<FilterAltIcon />} aria-label="delete">
+                    <Button sx={{ '& .MuiButton-endIcon ': { margin: '0px' } }} variant="contained" onClick={hanldeClickFilter} endIcon={<FilterAltIcon />} aria-label="delete">
 
                     </Button>
                 </Box>
@@ -401,7 +447,7 @@ const DailyReport = () => {
 
                     <Button sx={{ marginRight: '5px' }} startIcon={<AddIcon />} variant="contained" onClick={handleClickAdd}>{t('btn-add-report')}</Button>
                     <Button sx={{ marginRight: '15px' }} onClick={handleClickEdit} disabled={!rowSelected} startIcon={<EditIcon />} variant="contained">{t('btn-edit-report')}</Button>
-                    <Button sx={{ marginRight: '15px' }} onClick={handleClickEdit} disabled={!rowSelected} startIcon={<RemoveRedEyeIcon />} variant="contained">{t('btn-view-report')}</Button>
+                    <Button sx={{ marginRight: '15px' }} onClick={handleClickView} disabled={!rowSelected} startIcon={<RemoveRedEyeIcon />} variant="contained">{t('btn-view-report')}</Button>
                     <Button variant="contained" onClick={handleClickDelete} disabled={!rowSelected} size='small' startIcon={<DeleteIcon />}>
                         {t('btn-delete-report')}
                     </Button>
@@ -441,10 +487,10 @@ const DailyReport = () => {
                                         {getNameShift(row?.shift)}
                                     </StyledTableCell>
                                     <StyledTableCell align='center'>
-                                        A
+                                        {row.time}
                                     </StyledTableCell>
                                     <StyledTableCell align="left">{row?.model_name}</StyledTableCell>
-                                    <StyledTableCell align="center">{row?.color_name}</StyledTableCell>
+                                    <StyledTableCell align="center">{row?.color}</StyledTableCell>
                                     <StyledTableCell align="left">{row?.department_name}</StyledTableCell>
                                     <StyledTableCell align="left">{row?.stage_name}</StyledTableCell>
                                     <StyledTableCell align="center">{row?.quantity}</StyledTableCell>
@@ -460,9 +506,9 @@ const DailyReport = () => {
                 {listWork?.length > 0 && (<TablePagination
                     rowsPerPageOptions={ROWPERPAGE}
                     component="div"
-                    count={listWork.length}
+                    count={total}
                     rowsPerPage={rowPerpage}
-                    page={page}
+                    page={page} handleChangePage
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />)}

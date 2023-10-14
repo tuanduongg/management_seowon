@@ -8,7 +8,7 @@ import { Box } from '@mui/material';
 
 
 
-const QuillEditor = ({ data, setData }) => {
+const QuillEditor = ({ data, setData, readOnly, showToolbar }) => {
 
     const reactQuillRef = useRef(null);
     // const [editorHtml, setEditorHtml] = useState('');
@@ -53,7 +53,7 @@ const QuillEditor = ({ data, setData }) => {
     };
 
     const modules = {
-        toolbar: {
+        toolbar: !showToolbar ? false : {
             container: [                                    // remove formatting button
                 ['image']                                  // link and image, video
             ],
@@ -93,6 +93,7 @@ const QuillEditor = ({ data, setData }) => {
                 modules={modules}
                 placeholder='Please typing note...'
                 spellCheck={false}
+                readOnly={readOnly}
             />
         </Box>
     );
