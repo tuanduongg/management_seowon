@@ -170,7 +170,6 @@ const Stage = () => {
                             {item?.created_by}
                         </StyledTableCell>
                     </StyledTableRow>))}
-
                 </Table>
             </TableContainer>
         </Grid>
