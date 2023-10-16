@@ -10,16 +10,16 @@ import {
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ModelService } from './model.service';
+import { DepartService } from './depart.service';
 
-@Controller('model')
-export class ModelController {
-  constructor(private readonly modelService: ModelService) {}
+@Controller('department')
+export class DepartController {
+  constructor(private readonly departService: DepartService) {}
 
   @UseGuards(AuthGuard)
   @Post('/add')
   async addColor(@Body() body, @Req() request: Request, @Res() res: Response) {
-    const data = await this.modelService.add(body, request);
+    const data = await this.departService.addNew(body, request);
     if (data) {
       return res.status(HttpStatus.OK).send(data);
     }
@@ -31,14 +31,14 @@ export class ModelController {
   @UseGuards(AuthGuard)
   @Post('/getAll')
   async getAll(@Body() body, @Res() res: Response) {
-    const data = await this.modelService.getAll(body);
+    const data = await this.departService.getAll();
     return res.status(HttpStatus.OK).send(data);
   }
 
   @UseGuards(AuthGuard)
   @Post('/delete')
-  async delete(@Body() body, @Res() res: Response, @Req() request: Request) {
-    const data = await this.modelService.delete(body, request);
+  async delete(@Body() body, @Req() request: Request, @Res() res: Response) {
+    const data = await this.departService.deleteDepart(body, request);
     if (data) {
       return res.status(HttpStatus.OK).send(data);
     }
@@ -49,8 +49,8 @@ export class ModelController {
 
   @UseGuards(AuthGuard)
   @Post('/update')
-  async update(@Body() body, @Res() res: Response, @Req() request: Request) {
-    const data = await this.modelService.update(body, request);
+  async update(@Body() body, @Req() request: Request, @Res() res: Response) {
+    const data = await this.departService.updateDepart(body, request);
     if (data) {
       return res.status(HttpStatus.OK).send(data);
     }

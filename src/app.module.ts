@@ -8,10 +8,12 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 // import { Connection } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
-import { DepartmentModule } from './department/department.module';
 import { WorkModule } from './work/work.module';
 import { ColorModule } from './color/color.module';
 import { ModelModule } from './model/model.module';
+import { TimeModule } from './time/time.module';
+import { DepartModule } from './department/depart.module';
+import { StageModule } from './stage/stage.module';
 
 @Module({
   imports: [
@@ -51,11 +53,13 @@ import { ModelModule } from './model/model.module';
       },
     } as TypeOrmModuleAsyncOptions),
     UserModule,
-    DepartmentModule,
     AuthModule,
+    DepartModule,
     WorkModule,
     ColorModule,
     ModelModule,
+    TimeModule,
+    StageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

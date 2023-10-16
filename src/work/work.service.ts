@@ -307,6 +307,8 @@ export class WorkService {
       updated_by: request?.user?.username ?? '',
       update_at: new Date(),
     });
+    console.log('body', body);
+    console.log('modelCode', modelCode);
     const workModel = await this.workModelRepo.save({
       modelId: modelCode.value,
       id: workModelID,
@@ -331,7 +333,7 @@ export class WorkService {
       arrNG.push(newNg);
     });
     const workNG = await this.workNGRepo.insert(arrNG);
-    return { workModel, work };
+    return { workModel, work, workNG, data };
   }
 
   async uploadImageEditor() {
