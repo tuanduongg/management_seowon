@@ -3,9 +3,9 @@ import { Box, styled } from '@mui/system';
 import LOGO from '../assets/images/logo.png';
 
 const StyledLoading = styled('div')(() => ({
-  backgroundColor: '#00000029',
+  backgroundColor: '#00000014',
   width: '100%',
-  height: '100%',
+  height: '80vh',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -15,9 +15,10 @@ const StyledLoading = styled('div')(() => ({
   },
   '& .circleProgress': {
     position: 'absolute',
-    left: -7,
+    left: -9,
     right: 0,
-    top: 'calc(50% - 25px)',
+    top: 'calc(50% - 40px)',
+    width: '70px !important', height: '70px !important'
   },
 }));
 
@@ -26,7 +27,7 @@ const Loading = () => {
     <StyledLoading>
       <Box position="relative">
         <img src={LOGO} alt="logo" />
-        <CircularProgress className="circleProgress" />
+        <CircularProgress sx={{}} className="circleProgress" />
       </Box>
     </StyledLoading>
   );

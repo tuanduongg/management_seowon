@@ -151,7 +151,7 @@ const getNameShift = (shift) => {
     }
 }
 
-const ROWPERPAGE = [5, 10, 20];
+const ROWPERPAGE = [2, 5, 10, 20];
 const ALL = 'ALL';
 
 const MenuProps = {
@@ -469,7 +469,7 @@ const DailyReport = () => {
                             {listWork.map((row, index) => (
                                 <StyledTableRow sx={{ cursor: 'pointer' }} onClick={() => { handleClickRow(row) }} selected={row?.work_id === rowSelected?.work_id} hover key={row.work_id}>
                                     <StyledTableCell align='center'>
-                                        {index + 1}
+                                        {index + (page * rowPerpage) + 1}
                                     </StyledTableCell>
                                     <StyledTableCell align='center'>
                                         {row?.week}

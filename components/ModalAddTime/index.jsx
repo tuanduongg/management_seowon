@@ -22,13 +22,13 @@ const CustomModal = styled(Dialog)(({ theme }) => ({
     },
 }));
 const initialValidate = { err: false, message: '' };
-const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeModal }) => {
+const ModalAddTime = ({ open, onCloseModal, afterSave, rowSelect, typeModal }) => {
     const [name, setName] = useState('');
-    const [code, setCode] = useState('');
-    const [color, setColor] = useState('');
+    const [from, setFrom] = useState('');
+    const [to, setTo] = useState('');
     const [validateName, setValidateName] = useState(initialValidate);
-    const [validateCode, setValidateCode] = useState(initialValidate);
-    const [validateColor, setValidateColor] = useState(initialValidate);
+    const [validateFrom, setValidateFrom] = useState(initialValidate);
+    const [validateTo, setValidateTo] = useState(initialValidate);
 
     const handleChange = (e) => {
         const { value, name } = e.target;
@@ -39,11 +39,17 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
                 }
                 setName(value);
                 break;
-            case 'code':
-                if (validateCode.err) {
-                    setValidateCode(initialValidate);
+            case 'from':
+                if (validateFrom.err) {
+                    setValidateFrom(initialValidate);
                 }
-                setCode(value);
+                setFrom(value);
+                break;
+            case 'to':
+                if (validateTo.err) {
+                    setValidateTo(initialValidate);
+                }
+                setTo(value);
                 break;
 
             default:
@@ -54,37 +60,33 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
     useEffect(() => {
         if (rowSelect) {
             const {
-                model_id,
-                model_code,
-                model_name,
-                color,
+                time_from,
+                time_name,
+                time_to,
             } = rowSelect
-            setCode(model_code);
-            setColor(color);
-            setName(model_name);
-
-            console.log();
+            setTo(time_to);
+            setFrom(time_from);
+            setName(time_name);
         }
     }, [rowSelect])
 
     const handleSave = async () => {
-        const url = typeModal === 'ADD' ? RouteApi.addModel : RouteApi.updateModel;
+        const url = typeModal === 'ADD' ? RouteApi.addTime : RouteApi.updateTime;
         const response = await restApi.post(url, {
-            color, code, name, id: rowSelect?.model_id
+            from, to, name, id: rowSelect?.time_id
         });
         if (response?.status === 200) {
             ShowAlert({
                 iconProp: 'success',
                 textProp: typeModal === 'ADD' ? 'Thêm mới thông tin thành công !' : 'Lưu thông tin thành công!',
                 onClose: () => {
-
                     afterSave();
                 }
             });
         } else {
             ShowAlert({
                 iconProp: 'warning',
-                textProp: 'Code model đã tồn tại!',
+                textProp: 'Cannot update time!',
             });
         }
 
@@ -92,15 +94,15 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
 
     const handleClickSave = () => {
         if (name.trim().length === 0 || name.trim().length > 200) {
-            setValidateName({ err: true, message: 'Name model is required' });
+            setValidateName({ err: true, message: 'Name is required' });
             return;
         }
-        if (code.trim().length === 0 || code.trim().length > 200) {
-            setValidateCode({ err: true, message: 'Code model is required' });
+        if (from.trim().length === 0 || from.trim().length > 200) {
+            setValidateFrom({ err: true, message: 'From is required' });
             return;
         }
-        if (color.trim().length === 0) {
-            setValidateColor({ err: true, message: 'Color is required' });
+        if (to.trim().length === 0) {
+            setValidateTo({ err: true, message: 'To is required' });
             return;
         }
         handleSave();
@@ -111,11 +113,11 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
             return;
         }
         setName('');
-        setCode('');
-        setColor('');
+        setFrom('');
+        setTo('');
         setValidateName(initialValidate);
-        setValidateCode(initialValidate);
-        setValidateColor(initialValidate);
+        setValidateFrom(initialValidate);
+        setValidateTo(initialValidate);
         onCloseModal();
     }
     return (
@@ -126,7 +128,7 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
                 open={open}
             >
                 <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-                    {typeModal === 'ADD' ? '  Add new model' : 'Edit model'}
+                    {typeModal === 'ADD' ? '  Add new time' : 'Edit time'}
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
@@ -153,43 +155,41 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
                             label="Name"
                             value={name}
                             sx={{ marginRight: '20px' }}
-                            placeholder="Please typing name model..."
+                            placeholder="Please typing name ..."
                             error={validateName.err}
                             helperText={validateName.message}
                         />
                         <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
 
                             <TextField
+                                type="number"
                                 sx={{ marginRight: '10px' }}
-                                value={code}
+                                value={from}
                                 onChange={handleChange}
-                                name="code"
+                                name="from"
                                 size="small"
                                 fullWidth
                                 required
                                 id="outlined-required"
-                                label="Code"
-                                placeholder="Please typing code model..."
-                                error={validateCode.err}
-                                helperText={validateCode.message}
+                                label="From"
+                                placeholder="Please typing from..."
+                                error={validateFrom.err}
+                                helperText={validateFrom.message}
                             />
-                            <FormControl error={validateColor.err}
-                                size="small" fullWidth>
-                                <InputLabel id="demo-simple-select-label">Color</InputLabel>
-                                <Select
-                                    error={validateColor.err}
-                                    helperText={validateColor.message}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={color}
-                                    label="Color"
-                                    onChange={(e) => { if (validateColor.err) { setValidateColor(initialValidate) } setColor(e.target.value) }}
-                                >
-                                    {colors?.map((item, index) =>
-                                        (<MenuItem key={index} value={item.color_name}>{item.color_name}</MenuItem>))}
-                                </Select>
-                                <FormHelperText>{validateColor.message}</FormHelperText>
-                            </FormControl>
+                            <TextField
+                                type="number"
+                                value={to}
+                                onChange={handleChange}
+                                name="to"
+                                size="small"
+                                fullWidth
+                                required
+                                id="outlined-required"
+                                label="To"
+                                placeholder="Please typing to..."
+                                error={validateTo.err}
+                                helperText={validateTo.message}
+                            />
                         </Box>
                     </Box>
                 </Box>
@@ -208,4 +208,4 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
 
 }
 
-export default ModalAddModel;
+export default ModalAddTime;

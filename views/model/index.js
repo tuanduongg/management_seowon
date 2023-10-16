@@ -11,6 +11,8 @@ import ModalAddModel from 'components/ModalAddModel';
 import { useEffect, useState } from 'react';
 import { RouteApi } from 'RouteApi';
 import restApi from 'utils/restAPI';
+import Loading from 'components/MatxLoading';
+import { ShowAlert, ShowQuestion } from 'utils/confirm';
 
 
 
@@ -43,12 +45,12 @@ const HEAD_TABLE = [
         align: 'center'
     },
     {
-        title: 'Code',
+        title: 'Name',
         // with: '50px',
         align: 'center'
     },
     {
-        title: 'Name',
+        title: 'Code',
         // with: '50px',
         align: 'center'
     },
@@ -57,8 +59,13 @@ const HEAD_TABLE = [
         // with: '50px',
         align: 'center'
     },
+    {
+        title: 'Created By',
+        // with: '50px',
+        align: 'center'
+    },
 ];
-const ROWPERPAGE = [3, 5, 10, 20];
+const ROWPERPAGE = [5, 10, 20];
 
 
 
@@ -70,16 +77,16 @@ const Model = () => {
     const [total, setTotal] = useState(0);
     const { t, i18n } = useTranslation();
     const [page, setPage] = useState(0);
+    const [search, setSearch] = useState('');
     const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
     const [selected, setSelected] = useState(null);
     const [rowEdit, setRowEdit] = useState(null);
     const [typeModal, setTypeModal] = useState('');
+    const [loading, setLoading] = useState(false);
 
 
-    const onCloseModal = (e, reason) => {
-        if (reason === 'backdropClick') {
-            return;
-        }
+    const onCloseModal = () => {
+
         setRowEdit(null);
         setOpenModal(false);
     }
@@ -87,14 +94,23 @@ const Model = () => {
     const getColors = async () => {
         const url = RouteApi.getColors;
         const response = await restApi.get(url);
+
         setColors(response?.data);
     }
 
     const getModels = async () => {
+        setLoading(true);
         const url = RouteApi.getModels;
-        const response = await restApi.post(url, { page, rowPerpage });
-        setModels(response?.data?.models);
-        setTotal(response?.data?.total)
+        const response = await restApi.post(url, { page, rowPerpage, search });
+        if (response?.status === 200) {
+
+            setModels(response?.data?.models);
+            setTotal(response?.data?.total)
+            setLoading(false);
+        } else {
+            setLoading(false);
+
+        }
     }
     useEffect(() => {
         getModels();
@@ -109,7 +125,6 @@ const Model = () => {
     }
 
     useEffect(() => {
-        getModels();
         getColors();
     }, [])
     const onClickAdd = () => {
@@ -128,6 +143,39 @@ const Model = () => {
     const handleClickRow = (row) => {
         setSelected(row);
     }
+    const onChangeSearch = (e) => {
+        setSearch(e.target.value);
+
+    }
+    const handleClickSearch = () => {
+        setPage(0);
+        getModels();
+    }
+
+    const handleClickDelete = () => {
+        ShowQuestion({
+            content: 'Bạn chắc chắn muốn xóa ?',
+            icon: 'warning',
+            onClickYes: async () => {
+                const response = await restApi.post(RouteApi.deleteModel, { id: selected?.model_id });
+                if (response?.status === 200) {
+                    ShowAlert({
+                        textProp: 'Xóa thành công!',
+                        onClose: () => {
+                            getModels();
+                        }
+                    });
+                } else {
+                    ShowAlert({
+                        iconProp: 'warning',
+                        textProp: 'Xóa thất bại!',
+                    });
+                }
+            }
+        });
+    }
+
+    if (loading) return <Loading />;
     return (<><Grid container spacing={3}>
         <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Model</Typography >
 
@@ -136,12 +184,15 @@ const Model = () => {
                 <FormControl size='small' sx={{}} variant="outlined">
                     <InputLabel htmlFor="search">Search</InputLabel>
                     <OutlinedInput
+                        value={search}
+                        onChange={onChangeSearch}
                         placeholder='Search by name or code...'
                         id="search"
                         type={'text'}
                         endAdornment={
                             <InputAdornment position="end">
                                 <IconButton
+                                    onClick={handleClickSearch}
                                     aria-label="toggle password visibility"
                                     edge="end"
                                 >
@@ -157,7 +208,7 @@ const Model = () => {
 
                 <Button size='small' sx={{ marginRight: '5px' }} startIcon={<AddIcon />} onClick={onClickAdd} variant="contained">{t('btn-add')}</Button>
                 <Button size='small' disabled={!selected} sx={{ marginRight: '15px' }} onClick={onClickEdit} startIcon={<EditIcon />} variant="contained">{t('btn-edit')}</Button>
-                <Button size='small' disabled={!selected} variant="contained" startIcon={<DeleteIcon />}>
+                <Button size='small' disabled={!selected} onClick={handleClickDelete} variant="contained" startIcon={<DeleteIcon />}>
                     {t('btn-delete')}
                 </Button>
             </Box>
@@ -172,9 +223,9 @@ const Model = () => {
                                 <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
                         </TableRow>
                     </TableHead>
-                    {models?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.model_id === selected?.model_id} sx={{ cursor: 'pointer' }} hover>
+                    {models?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.model_id === selected?.model_id} sx={{ cursor: 'pointer' }}>
                         <StyledTableCell align='center'>
-                            {index + 1}
+                            {index + (page * rowPerpage) + 1}
                         </StyledTableCell>
                         <StyledTableCell align='center'>
                             {item?.model_name}
@@ -184,6 +235,9 @@ const Model = () => {
                         </StyledTableCell>
                         <StyledTableCell align='center'>
                             {item?.color}
+                        </StyledTableCell>
+                        <StyledTableCell align='center'>
+                            {item?.created_by}
                         </StyledTableCell>
                     </StyledTableRow>))}
 

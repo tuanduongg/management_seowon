@@ -12,4 +12,22 @@ export const RouteApi = {
     getColors: 'color/colors',
     addModel: 'model/add',
     getModels: 'model/getAll',
+    deleteModel: 'model/delete',
+    updateModel: 'model/update',
+
+    addTime: 'time/add',
+    getTime: 'time/getAll',
+    deleteTime: 'time/delete',
+    updateTime: 'time/update',
+
+    addDepart: 'department/add',
+    getDepart: 'department/getAll',
+    deleteDepart: 'department/delete',
+    updateDepart: 'department/update',
+
+
+    addStage: 'stage/add',
+    getStage: 'stage/getAll',
+    deleteStage: 'stage/delete',
+    updateStage: 'stage/update',
 };

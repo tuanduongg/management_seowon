@@ -8,24 +8,6 @@ const restApi = axios.create({
     baseURL: ConfigApp.API_URL, // Thay thế bằng URL API thực tế của bạn
 });
 
-// const SendRequest = async (method, url, data = null, headers = {}) => {
-//   try {
-//     const response = await axiosInstance({
-//       method,
-//       url,
-//       data,
-//       headers,
-//     });
-//     return response;
-//   } catch (error) {
-//     return error;
-//   }
-// };
-
-// export default SendRequest;
-
-// const axios = require('axios');
-// const restApi = axios.create();
 // Request interceptor for API calls
 restApi.interceptors.request.use(
     async config => {
@@ -53,7 +35,7 @@ restApi.interceptors.response.use((response) => {
     //     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
     //     return restApi(originalRequest);
     // }
-    return Promise.reject(error);
+    return (error);
 });
 
 export default restApi;
