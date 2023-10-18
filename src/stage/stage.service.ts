@@ -40,9 +40,21 @@ export class StageService {
     }
     return null;
   }
-  async getAll() {
-    const data = await this.stageRepo.find({});
-    return data;
+  async getAll(body) {
+    const page = body.page || 0; // Current page number
+    const limit = body.rowPerpage || 10;
+    const search = body.search;
+    const skip = page * limit;
+    const skipValue = skip >= 0 ? skip : 0;
+    const [stages, total] = await this.stageRepo
+      .createQueryBuilder('model')
+      .where('model.delete_at IS NULL')
+      .andWhere('model.stage_name LIKE :keyword ', { keyword: `%${search}%` })
+      .skip(skipValue)
+      .take(limit)
+      .orderBy('created_at', 'DESC')
+      .getManyAndCount();
+    return { stages, total };
   }
 }
 

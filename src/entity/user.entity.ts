@@ -19,7 +19,6 @@ export class User {
   @Column()
   username: string;
 
-
   @Column()
   password: string;
 
@@ -38,15 +37,16 @@ export class User {
   @DeleteDateColumn({ type: 'datetime', nullable: true })
   delete_at: Date;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   created_by: string;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   updated_by: string;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   deleted_by: string;
 
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
   }
+
 }

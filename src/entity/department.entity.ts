@@ -25,10 +25,10 @@ export class Department {
   @DeleteDateColumn({ type: 'datetime', nullable: true })
   delete_at: Date;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   created_by: string;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   updated_by: string;
-  @Column({nullable: true})
+  @Column({ nullable: true })
   deleted_by: string;
 }

@@ -31,7 +31,7 @@ export class StageController {
   @UseGuards(AuthGuard)
   @Post('/getAll')
   async getAll(@Body() body, @Res() res: Response) {
-    const data = await this.stageService.getAll();
+    const data = await this.stageService.getAll(body);
     return res.status(HttpStatus.OK).send(data);
   }
 

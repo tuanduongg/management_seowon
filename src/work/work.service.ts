@@ -223,7 +223,6 @@ export class WorkService {
 
     const rsQuery = query.replaceAll('\n', '');
     const rsCoutQuery = countQuery.replaceAll('\n', '');
-
     // return { rsQuery, rsCoutQuery };
 
     // const query = `select work.work_id,work.week,work.day,work.month,work.year,work.shift,work.created_at,department.department_name,DataSelect.*
@@ -300,15 +299,13 @@ export class WorkService {
       month,
       year,
       week,
-      time_id: time,
+      time: time,
       department_id: department,
       importer: nameImporter,
       note,
       updated_by: request?.user?.username ?? '',
       update_at: new Date(),
     });
-    console.log('body', body);
-    console.log('modelCode', modelCode);
     const workModel = await this.workModelRepo.save({
       modelId: modelCode.value,
       id: workModelID,

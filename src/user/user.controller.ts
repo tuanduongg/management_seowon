@@ -1,15 +1,25 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Res, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Res,
+  HttpStatus,
+  UseGuards,
+  Body,
+  Req,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Response } from 'express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('users')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/create')
-  async getHello(@Res() res: Response) {
-    const user = await this.userService.createUser();
+  @UseGuards(AuthGuard)
+  @Post('/create')
+  async create(@Body() body, @Res() res: Response, @Req() request: Request) {
+    const user = await this.userService.createUser(body, request);
     if (user) {
       user.password = '';
       return res.status(HttpStatus.CREATED).send(user);
@@ -18,9 +28,25 @@ export class UserController {
       .status(HttpStatus.BAD_REQUEST)
       .send({ message: 'Cannot create user' });
   }
-  @Get('/all')
-  async getAll(@Res() res: Response) {
-    const users = await this.userService.getAll();
+
+  @UseGuards(AuthGuard)
+  @Post('/all')
+  async getAll(@Body() body, @Res() res: Response) {
+    const users = await this.userService.getAll(body);
+    return res.status(HttpStatus.OK).send(users);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/update')
+  async update(@Body() body, @Res() res: Response, @Req() request: Request) {
+    const users = await this.userService.update(body, request);
+    return res.status(HttpStatus.OK).send(users);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/delete')
+  async delete(@Body() body, @Res() res: Response, @Req() request: Request) {
+    const users = await this.userService.delete(body, request);
     return res.status(HttpStatus.OK).send(users);
   }
 }
