@@ -13,6 +13,7 @@ import { RouteApi } from 'RouteApi';
 import restApi from 'utils/restAPI';
 import Loading from 'components/MatxLoading';
 import { ShowAlert, ShowQuestion } from 'utils/confirm';
+import { ROWPERPAGE } from 'utils/constant';
 
 
 
@@ -60,12 +61,12 @@ const HEAD_TABLE = [
         align: 'center'
     },
     {
-        title: 'Created By',
+        title: 'Recently update',
         // with: '50px',
         align: 'center'
     },
 ];
-const ROWPERPAGE = [5, 10, 20];
+
 
 
 
@@ -77,8 +78,8 @@ const Model = () => {
     const [total, setTotal] = useState(0);
     const { t, i18n } = useTranslation();
     const [page, setPage] = useState(0);
-    const [search, setSearch] = useState('');
     const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
+    const [search, setSearch] = useState('');
     const [selected, setSelected] = useState(null);
     const [rowEdit, setRowEdit] = useState(null);
     const [typeModal, setTypeModal] = useState('');
@@ -175,6 +176,13 @@ const Model = () => {
         });
     }
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleClickSearch();
+        }
+
+    }
+
     if (loading) return <Loading />;
     return (<><Grid container spacing={3}>
         <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Model</Typography >
@@ -184,6 +192,7 @@ const Model = () => {
                 <FormControl size='small' sx={{}} variant="outlined">
                     <InputLabel htmlFor="search">Search</InputLabel>
                     <OutlinedInput
+                        onKeyDown={handleKeyDown}
                         value={search}
                         onChange={onChangeSearch}
                         placeholder='Search by name or code...'

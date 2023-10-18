@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { ShowQuestion, ShowAlert } from 'utils/confirm';
 import ClearIcon from '@mui/icons-material/Clear';
+import { ROWPERPAGE } from 'utils/constant';
 // the hook
 
 
@@ -151,7 +152,6 @@ const getNameShift = (shift) => {
     }
 }
 
-const ROWPERPAGE = [2, 5, 10, 20];
 const ALL = 'ALL';
 
 const MenuProps = {

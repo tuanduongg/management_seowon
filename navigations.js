@@ -14,6 +14,15 @@ export const navigations = [
       { name: 'stage', icon: 'checklistrtl', path: ConfigRouter.stage },
     ],
   },
+  { label: 'user', type: 'label' },
+  // {
+  //   name: 'Quản lý người dùng',
+  //   icon: 'group',
+  //   children: [
+  //     { name: 'user', path: ConfigRouter.user, icon: 'person' },
+  //   ],
+  // },
+  { name: 'Quản lý tài khoản', path: ConfigRouter.user, icon: 'person' },
   // { label: 'Components', type: 'label' },
   // {
   //   name: 'Components',

@@ -1,13 +1,8 @@
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Box, Button, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, styled, tableCellClasses } from "@mui/material";
-import NoData from "components/NoData";
-import { H4 } from "components/Typography";
+import { Box, Button, Grid, Table, TableCell, TableContainer, TableHead, TableRow, Typography, styled, tableCellClasses } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import SearchIcon from '@mui/icons-material/Search';
-import ModalAddModel from 'components/ModalAddModel';
 import { useEffect, useState } from 'react';
 import { RouteApi } from 'RouteApi';
 import restApi from 'utils/restAPI';
@@ -46,12 +41,12 @@ const HEAD_TABLE = [
         align: 'center'
     },
     {
-        title: 'Time name',
+        title: 'Time',
         // with: '50px',
         align: 'center'
     },
     {
-        title: 'Value',
+        title: 'From - To',
         // with: '50px',
         align: 'center'
     },
@@ -63,12 +58,9 @@ const ROWPERPAGE = [5, 10, 20];
 
 const Time = () => {
     const [openModal, setOpenModal] = useState(false);
-    const [colors, setColors] = useState([]);
     const [times, setTimes] = useState([]);
-    const [total, setTotal] = useState(0);
     const { t, i18n } = useTranslation();
     const [page, setPage] = useState(0);
-    const [search, setSearch] = useState('');
     const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
     const [selected, setSelected] = useState(null);
     const [rowEdit, setRowEdit] = useState(null);
@@ -102,16 +94,9 @@ const Time = () => {
         setOpenModal(false);
     }
 
-    const handleChangePage = (e, page) => {
-        setPage(page);
-    }
     const onClickAdd = () => {
         setTypeModal('ADD');
         setOpenModal(true);
-    }
-    const handleChangeRowsPerPage = (e) => {
-        setPage(0);
-        setRowPerpage(e.target.value);
     }
     const onClickEdit = () => {
         setTypeModal('EDIT');
@@ -120,14 +105,6 @@ const Time = () => {
     }
     const handleClickRow = (row) => {
         setSelected(row);
-    }
-    const onChangeSearch = (e) => {
-        setSearch(e.target.value);
-
-    }
-    const handleClickSearch = () => {
-        setPage(0);
-        getData();
     }
 
     const handleClickDelete = () => {

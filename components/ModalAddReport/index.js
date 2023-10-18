@@ -16,7 +16,15 @@ import { RouteApi } from "RouteApi";
 import { useSelector } from 'react-redux';
 import ModalAddNewData from "components/ModalAddNewData";
 import { ShowAlert } from "utils/confirm";
+import SaveIcon from '@mui/icons-material/Save';
 
+
+
+const CustomTexFiled = styled(TextField)(({ theme }) => ({
+    "& .MuiInputBase-root.Mui-disabled": {
+        color: "rgba(0, 0, 0, 0.6)" // (default alpha is 0.38)
+    }
+}));
 const CustomModal = styled(Dialog)(({ theme }) => ({
     zIndex: 100, // Set your desired z-index value
     '& .MuiDialogContent-root': {
@@ -29,6 +37,8 @@ const CustomModal = styled(Dialog)(({ theme }) => ({
         padding: theme.spacing(1),
     },
 }));
+
+
 
 const SHIFT = [
     {
@@ -167,8 +177,6 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
 
     const contentRef = useRef(null);
 
-    console.log('typeModal', typeModal);
-
 
     const onCloseModal = (e, reason) => {
         if (reason && reason === "backdropClick") {
@@ -272,7 +280,6 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
             setListTime(times);
         }
     }, [dataMaster]);
-
     const getModelById = (id) => {
         if (id) {
 
@@ -300,7 +307,7 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                     month,
                     year,
                     week,
-                    time_id,
+                    time,
                     department_id,
                     importer,
                     note,
@@ -317,7 +324,7 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                 setDay(day);
                 setMonth(month);
                 setYear(year);
-                setTime(time_id);
+                setTime(time);
                 setDepartment(department_id);
                 setNameImporter(importer);
                 setNote(note);
@@ -677,7 +684,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={2}>
                             <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Ca</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select inputProps={{
+                                    readOnly: typeModal === 'VIEW'
+                                }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -699,7 +708,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={1.5}>
                             <FormControl sx={{ m: 1, width: '90%' }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Time</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select inputProps={{
+                                    readOnly: typeModal === 'VIEW'
+                                }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -721,7 +732,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={2}>
                             <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Tuần</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select inputProps={{
+                                    readOnly: typeModal === 'VIEW'
+                                }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -743,7 +756,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={2}>
                             <FormControl variant="standard" sx={{ m: 1, minWidth: 100 }}>
                                 <InputLabel id="demo-simple-select-standard-label">Ngày</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select inputProps={{
+                                    readOnly: typeModal === 'VIEW'
+                                }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -766,7 +781,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={2}>
                             <FormControl sx={{ m: 1, minWidth: 100 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Tháng</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select inputProps={{
+                                    readOnly: typeModal === 'VIEW'
+                                }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -788,7 +805,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={2}>
                             <FormControl sx={{ m: 1, minWidth: 120 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Năm</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select inputProps={{
+                                    readOnly: typeModal === 'VIEW'
+                                }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -812,7 +831,10 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                         <Grid item xs={2.4}>
                             <FormControl error={validateDepart.error} sx={{ m: 1, minWidth: 120 }} variant="standard">
                                 <InputLabel id="demo-controlled-open-select-label">Phòng ban</InputLabel>
-                                <Select disabled={typeModal === 'VIEW'}
+                                <Select
+                                    inputProps={{
+                                        readOnly: typeModal === 'VIEW'
+                                    }}
                                     MenuProps={{
                                         sx: {
                                             "&& .Mui-selected": {
@@ -835,7 +857,9 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
 
                         </Grid>
                         <Grid item xs={4}>
-                            <TextField disabled={typeModal === 'VIEW'} onBlur={handleBlur} name="nameImporter" id="filled-basic" error={validateNameImport.error} helperText={validateNameImport.msg} value={nameImporter} onChange={(e) => {
+                            <TextField inputProps={
+                                { readOnly: typeModal === 'VIEW' }
+                            } onBlur={handleBlur} name="nameImporter" id="filled-basic" error={validateNameImport.error} helperText={validateNameImport.msg} value={nameImporter} onChange={(e) => {
                                 if (validateNameImport.error) {
                                     setValidateNameImport(initValidate);
                                 }
@@ -850,7 +874,7 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
 
                     <Grid sx={{ margin: '0px 0px' }} spacing={1} container>
                         <Grid item xs={3}>
-                            <Autocomplete disabled={typeModal === 'VIEW'}
+                            <Autocomplete
 
                                 value={modelCode}
                                 sx={{
@@ -858,22 +882,23 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                                     {
                                         backgroundColor: "#ddd",
                                     },
+                                    pointerEvents: typeModal === 'VIEW' ? "none" : '',
                                 }}
                                 onChange={onChangeModel}
                                 disablePortal
                                 options={ListModel}
-                                renderInput={(params) => <TextField placeholder="Nhập tên model..." variant="standard" {...params} label="Model" />}
+                                renderInput={(params) => <CustomTexFiled placeholder="Nhập tên model..." variant="standard" {...params} label="Model" />}
                             />
                         </Grid>
                         <Grid item xs={3}>
                             <Autocomplete
-                                disabled
                                 autoComplete='off'
                                 sx={{
                                     "& + .MuiAutocomplete-popper .MuiAutocomplete-option[aria-selected='true']":
                                     {
                                         backgroundColor: "#ddd",
                                     },
+                                    pointerEvents: "none",
                                 }}
                                 renderOption={(props, option) => {
                                     const { label, color } = option;
@@ -894,12 +919,12 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                                 }}
                                 disablePortal
                                 options={[...ListColor, initOption]}
-                                renderInput={(params) => <TextField disabled placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
+                                renderInput={(params) => <CustomTexFiled disabled placeholder="Nhập màu sắc..." variant="standard" {...params} label="Màu sắc" />}
                             />
                         </Grid>
                         <Grid item xs={3}>
                             <Autocomplete
-                                disabled={typeModal === 'VIEW'}
+
                                 renderOption={(props, option) => {
                                     const { label, color } = option;
                                     return (
@@ -913,6 +938,7 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                                     {
                                         backgroundColor: "#ddd",
                                     },
+                                    pointerEvents: typeModal === 'VIEW' ? "none" : '',
                                 }}
                                 value={stage}
                                 onChange={(event, newValue) => {
@@ -925,17 +951,21 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                                 }}
                                 disablePortal
                                 options={[...ListStage, initOption]}
-                                renderInput={(params) => <TextField name="stage" placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
+                                renderInput={(params) => <CustomTexFiled name="stage" placeholder="Nhập công đoạn..." variant="standard" {...params} label="Công đoạn" />}
                             />
                         </Grid>
 
                         <Grid item xs={3}>
-                            <TextField disabled={typeModal === 'VIEW'} placeholder="Nhập thông tin máy..." label="Máy" value={machine} onChange={(e) => { setMachine(e.target.value) }} variant="standard" />
+                            <CustomTexFiled inputProps={{
+                                readOnly: typeModal === 'VIEW'
+                            }} placeholder="Nhập thông tin máy..." label="Máy" value={machine} onChange={(e) => { setMachine(e.target.value) }} variant="standard" />
                         </Grid>
                     </Grid>
                     <Grid sx={{ margin: '10px 0px' }} spacing={1} container>
                         <Grid item xs={3}>
-                            <TextField disabled={typeModal === 'VIEW'} label="Số lượng" error={validateQuantity.error} helperText={validateQuantity.msg} onChange={(e) => {
+                            <CustomTexFiled inputProps={{
+                                readOnly: typeModal === 'VIEW'
+                            }} label="Số lượng" error={validateQuantity.error} helperText={validateQuantity.msg} onChange={(e) => {
                                 if (validateQuantity.error) {
                                     setValidateQuantity(initValidate);
                                 }
@@ -943,13 +973,19 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                             }} type="number" value={quantity} onBlur={handleBlur} name="quantity" placeholder="Nhập tổng số lượng" variant="standard" />
                         </Grid>
                         <Grid item xs={3}>
-                            <TextField disabled={typeModal === 'VIEW'} error={validateTotalOK.error} helperText={validateTotalOK.msg} label="Tổng số OK" onBlur={handleBlur} name="totalOK" onChange={onChangeTotalOK} type="number" value={totalOK} placeholder="Nhập tổng số OK" variant="standard" />
+                            <CustomTexFiled inputProps={{
+                                readOnly: typeModal === 'VIEW'
+                            }} error={validateTotalOK.error} helperText={validateTotalOK.msg} label="Tổng số OK" onBlur={handleBlur} name="totalOK" onChange={onChangeTotalOK} type="number" value={totalOK} placeholder="Nhập tổng số OK" variant="standard" />
                         </Grid>
                         <Grid item xs={3}>
-                            <TextField disabled={typeModal === 'VIEW'} error={validateTotalNG.error} helperText={validateTotalNG.msg} placeholder="Nhập tổng số NG" onBlur={handleBlur} name="totalNG" onChange={onChangeTotalNG} type="number" value={totalNG} label="Tổng số NG" variant="standard" />
+                            <CustomTexFiled inputProps={{
+                                readOnly: typeModal === 'VIEW'
+                            }} error={validateTotalNG.error} helperText={validateTotalNG.msg} placeholder="Nhập tổng số NG" onBlur={handleBlur} name="totalNG" onChange={onChangeTotalNG} type="number" value={totalNG} label="Tổng số NG" variant="standard" />
                         </Grid>
                         <Grid item xs={3}>
-                            <TextField disabled={typeModal === 'VIEW'} label="Tỷ lệ(%)" InputProps={{
+                            <CustomTexFiled inputProps={{
+                                readOnly: typeModal === 'VIEW'
+                            }} label="Tỷ lệ(%)" InputProps={{
                                 readOnly: true,
                             }} value={percent} onChange={(e) => { setMachine(e.target.value); }} variant="standard" />
                         </Grid>
@@ -959,10 +995,10 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
 
                 {typeModal !== 'VIEW' && (<Grid sx={{ margin: '0px 0px', width: '100%' }} spacing={1} container>
                     <Grid item xs={6.5}>
-                        <TextField fullWidth value={nameNG} onChange={(e) => { setValidateNameNG(initValidate); setNameNG(e.target.value); }} helperText={validateNameNG.msg} error={validateNameNG.error} placeholder="Nhập nội dung lỗi..." label="Nội dung lỗi" variant="standard" />
+                        <CustomTexFiled fullWidth value={nameNG} onChange={(e) => { setValidateNameNG(initValidate); setNameNG(e.target.value); }} helperText={validateNameNG.msg} error={validateNameNG.error} placeholder="Nhập nội dung lỗi..." label="Nội dung lỗi" variant="standard" />
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField type="number" fullWidth value={numNG} helperText={validateNumNG.msg} error={validateNumNG.error} onChange={(e) => { setValidateNumNG(initValidate); setNumNG(e.target.value); }} placeholder="Nhập số lượng..." label="Số lượng" variant="standard" />
+                        <CustomTexFiled type="number" fullWidth value={numNG} helperText={validateNumNG.msg} error={validateNumNG.error} onChange={(e) => { setValidateNumNG(initValidate); setNumNG(e.target.value); }} placeholder="Nhập số lượng..." label="Số lượng" variant="standard" />
                     </Grid>
                     <Grid sx={{ textAlign: 'right' }} item xs={1.5}>
                         <Button onClick={hanldeAddInputNG} sx={{ marginTop: '20px' }} variant="text" startIcon={<AddIcon />}>
@@ -1040,7 +1076,7 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                 <Button sx={{ color: 'black', fontWeight: 'bold' }} onClick={onCloseModal}>
                     Đóng
                 </Button>
-                <Button variant="contained" autoFocus onClick={handleClickSave}>
+                <Button startIcon={<SaveIcon />} variant="contained" autoFocus onClick={handleClickSave}>
                     Lưu
                 </Button>
             </DialogActions>)}

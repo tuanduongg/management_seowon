@@ -22,7 +22,7 @@ const CustomModal = styled(Dialog)(({ theme }) => ({
     },
 }));
 const initialValidate = { err: false, message: '' };
-const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeModal }) => {
+const ModalAccount = ({ open, onCloseModal, colors, afterSave, rowSelect, typeModal }) => {
     const [name, setName] = useState('');
     const [code, setCode] = useState('');
     const [color, setColor] = useState('');
@@ -54,16 +54,16 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
     useEffect(() => {
         if (rowSelect) {
             const {
-                model_id,
-                model_code,
-                model_name,
-                color,
+                user_id,
+                department_id,
+                username,
+                role,
             } = rowSelect
-            setCode(model_code);
-            setColor(color);
-            setName(model_name);
+            // setCode(model_code);
+            // setColor(color);
+            setName(username);
 
-            console.log();
+            console.log(rowSelect);
         }
     }, [rowSelect])
 
@@ -126,7 +126,7 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
                 open={open}
             >
                 <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-                    {typeModal === 'ADD' ? '  Add new model' : 'Edit model'}
+                    {typeModal === 'ADD' ? '  Add new account' : 'Edit account'}
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
@@ -150,7 +150,7 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
                             fullWidth
                             required
                             id="outlined-required"
-                            label="Name"
+                            label="Username"
                             value={name}
                             sx={{ marginRight: '20px' }}
                             placeholder="Please typing name model..."
@@ -208,4 +208,4 @@ const ModalAddModel = ({ open, onCloseModal, colors, afterSave, rowSelect, typeM
 
 }
 
-export default ModalAddModel;
+export default ModalAccount;

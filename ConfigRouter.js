@@ -8,6 +8,7 @@ export const ConfigRouter = {
   time: '/time',
   department: '/department',
   stage: '/stage',
+  user: '/account',
 
   home: '/',
 };

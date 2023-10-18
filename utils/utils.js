@@ -173,3 +173,23 @@ export const flat = (array) => {
 };
 
 
+export const showDateTimeFromDB = (dateStr) => {
+  if (dateStr) {
+    const date = new Date(dateStr);
+
+    const options = {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+
+    const formattedDate = date.toLocaleString("vi-VN", options);
+    return formattedDate;
+
+  }
+
+  return '';
+}
+

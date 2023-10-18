@@ -99,6 +99,7 @@ export const AuthProvider = ({ children }) => {
         if (response?.data?.user) {
 
             const { accessToken, user } = response.data;
+            console.log({ accessToken, user });
 
             setSession(accessToken, user);
 
@@ -152,6 +153,7 @@ export const AuthProvider = ({ children }) => {
                             user,
                         },
                     })
+                    setSession(accessToken, user);
                 } else {
                     dispatch({
                         type: 'INIT',

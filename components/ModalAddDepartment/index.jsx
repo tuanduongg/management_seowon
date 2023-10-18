@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import restApi from "utils/restAPI";
 import { RouteApi } from "RouteApi";
 import { ShowAlert } from "utils/confirm";
+import SaveIcon from '@mui/icons-material/Save';
 
 
 
@@ -136,7 +137,7 @@ const ModalAddDepartment = ({ open, onCloseModal, afterSave, rowSelect, typeModa
                     <Button sx={{ color: 'black', fontWeight: 'bold' }} onClick={beforeClose}>
                         Đóng
                     </Button>
-                    <Button variant="contained" autoFocus onClick={handleClickSave}>
+                    <Button startIcon={<SaveIcon />} variant="contained" autoFocus onClick={handleClickSave}>
                         Lưu
                     </Button>
                 </DialogActions>

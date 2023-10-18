@@ -1,19 +1,18 @@
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, Button, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, styled, tableCellClasses } from "@mui/material";
-import NoData from "components/NoData";
-import { H4 } from "components/Typography";
 import { useTranslation } from "react-i18next";
-import SearchIcon from '@mui/icons-material/Search';
-import ModalAddModel from 'components/ModalAddModel';
 import { useEffect, useState } from 'react';
 import { RouteApi } from 'RouteApi';
 import restApi from 'utils/restAPI';
 import Loading from 'components/MatxLoading';
 import { ShowAlert, ShowQuestion } from 'utils/confirm';
-import ModalAddDepartment from 'components/ModalAddDepartment';
+import ModalAddStage from 'components/ModalAddStage';
+import { ROWPERPAGE } from 'utils/constant';
+import SearchIcon from '@mui/icons-material/Search';
+import { showDateTimeFromDB } from 'utils/utils';
+
 
 
 
@@ -55,8 +54,12 @@ const HEAD_TABLE = [
         // with: '50px',
         align: 'center'
     },
+    {
+        title: 'Recently update',
+        // with: '50px',
+        align: 'center'
+    },
 ];
-const ROWPERPAGE = [5, 10, 20];
 
 
 
@@ -69,6 +72,10 @@ const Stage = () => {
     const [rowEdit, setRowEdit] = useState(null);
     const [typeModal, setTypeModal] = useState('');
     const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [total, setTotal] = useState(0);
+    const [search, setSearch] = useState('');
+    const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
 
 
     const onCloseModal = () => {
@@ -80,9 +87,10 @@ const Stage = () => {
     const getData = async () => {
         setLoading(true);
         const url = RouteApi.getStage;
-        const response = await restApi.post(url, {});
+        const response = await restApi.post(url, { search, page, rowPerpage });
         if (response?.status === 200) {
-            setDataList(response?.data);
+            setDataList(response?.data?.stages);
+            setTotal(response?.data?.total);
             setLoading(false);
         } else {
             setLoading(false);
@@ -96,9 +104,9 @@ const Stage = () => {
     }
 
 
-    useEffect(() => {
-        getData();
-    }, [])
+    // useEffect(() => {
+    //     getData();
+    // }, [])
     const onClickAdd = () => {
         setTypeModal('ADD');
         setOpenModal(true);
@@ -110,6 +118,26 @@ const Stage = () => {
     }
     const handleClickRow = (row) => {
         setSelected(row);
+    }
+
+    const handleChangeRowsPerPage = (e) => {
+        setPage(0);
+        setRowPerpage(e.target.value);
+    }
+
+    const handleChangePage = (e, page) => {
+        setPage(page);
+    }
+
+    useEffect(() => {
+        getData();
+    }, [page, rowPerpage])
+
+    const onChangeSearch = (e) => {
+        setSearch(e.target.value);
+    }
+    const handleClickSearch = () => {
+        getData();
     }
 
     const handleClickDelete = () => {
@@ -135,11 +163,42 @@ const Stage = () => {
         });
     }
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleClickSearch();
+        }
+
+    }
+
     if (loading) return <Loading />;
     return (<><Grid container spacing={3}>
-        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Model</Typography >
-
-        <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }} item lg={12} md={12} sm={12} xs={12}>
+        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Stage</Typography >
+        <Grid sx={{ display: 'flex', justifyContent: 'space-between' }} item lg={12} md={12} sm={12} xs={12}>
+            <Box>
+                <FormControl size='small' sx={{}} variant="outlined">
+                    <InputLabel htmlFor="search">Search</InputLabel>
+                    <OutlinedInput
+                        value={search}
+                        onKeyDown={handleKeyDown}
+                        onChange={onChangeSearch}
+                        placeholder='Search by name or code...'
+                        id="search"
+                        type={'text'}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    onClick={handleClickSearch}
+                                    aria-label="toggle password visibility"
+                                    edge="end"
+                                >
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                        label="Password"
+                    />
+                </FormControl>
+            </Box>
             <Box sx={{ display: 'flex' }}>
 
                 <Button size='small' sx={{ marginRight: '5px' }} startIcon={<AddIcon />} onClick={onClickAdd} variant="contained">{t('btn-add')}</Button>
@@ -161,7 +220,7 @@ const Stage = () => {
                     </TableHead>
                     {dataList?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.stage_id === selected?.stage_id} sx={{ cursor: 'pointer' }}>
                         <StyledTableCell align='center'>
-                            {index + 1}
+                            {index + 1 + (page * rowPerpage)}
                         </StyledTableCell>
                         <StyledTableCell align='center'>
                             {item?.stage_name}
@@ -169,12 +228,24 @@ const Stage = () => {
                         <StyledTableCell align='center'>
                             {item?.created_by}
                         </StyledTableCell>
+                        <StyledTableCell align='center'>
+                            {showDateTimeFromDB(item?.updated_at)}
+                        </StyledTableCell>
                     </StyledTableRow>))}
                 </Table>
             </TableContainer>
+            {dataList?.length > 0 && (<TablePagination
+                rowsPerPageOptions={ROWPERPAGE}
+                component="div"
+                count={total}
+                rowsPerPage={rowPerpage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />)}
         </Grid>
     </Grid>
-        <ModalAddDepartment open={openModal} rowSelect={rowEdit} typeModal={typeModal} afterSave={afterSave} onCloseModal={onCloseModal} />
+        <ModalAddStage open={openModal} rowSelect={rowEdit} typeModal={typeModal} afterSave={afterSave} onCloseModal={onCloseModal} />
     </>);
 }
 
