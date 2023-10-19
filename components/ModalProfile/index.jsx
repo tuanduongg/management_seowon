@@ -23,7 +23,7 @@ const CustomModal = styled(Dialog)(({ theme }) => ({
     },
 }));
 const initialValidate = { err: false, message: '' };
-const ModalAccount = ({ open, onCloseModal, afterSave, rowSelect, typeModal }) => {
+const ModalProfile = ({ open, onCloseModal, afterSave, rowSelect, typeModal }) => {
     const [username, setUserName] = useState('');
     const [role, setRole] = useState(ROLES[0]);
     const [validateUserName, setValidateUserName] = useState(initialValidate);
@@ -151,7 +151,7 @@ const ModalAccount = ({ open, onCloseModal, afterSave, rowSelect, typeModal }) =
                 open={open}
             >
                 <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-                    {typeModal === 'ADD' ? '  Add new account' : 'Edit account'}
+                    Profile
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
@@ -251,4 +251,4 @@ const ModalAccount = ({ open, onCloseModal, afterSave, rowSelect, typeModal }) =
 
 }
 
-export default ModalAccount;
+export default ModalProfile;

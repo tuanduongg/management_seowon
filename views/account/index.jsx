@@ -105,8 +105,8 @@ const Account = () => {
     }
 
     const afterSave = () => {
-        getData();
         onCloseModal();
+        getData();
     }
 
 
@@ -208,8 +208,8 @@ const Account = () => {
             <Box sx={{ display: 'flex' }}>
 
                 <Button size='small' sx={{ marginRight: '5px' }} startIcon={<AddIcon />} onClick={onClickAdd} variant="contained">{t('btn-add')}</Button>
-                <Button size='small' disabled={!selected} sx={{ marginRight: '15px' }} onClick={onClickEdit} startIcon={<EditIcon />} variant="contained">{t('btn-edit')}</Button>
-                <Button size='small' disabled={!selected} onClick={handleClickDelete} variant="contained" startIcon={<DeleteIcon />}>
+                <Button size='small' disabled={!selected || selected?.role === 'ADMIN'} sx={{ marginRight: '15px' }} onClick={onClickEdit} startIcon={<EditIcon />} variant="contained">{t('btn-edit')}</Button>
+                <Button size='small' disabled={!selected || selected?.role === 'ADMIN'} onClick={handleClickDelete} variant="contained" startIcon={<DeleteIcon />}>
                     {t('btn-delete')}
                 </Button>
             </Box>

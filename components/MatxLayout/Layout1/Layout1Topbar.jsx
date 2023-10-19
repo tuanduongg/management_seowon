@@ -6,11 +6,13 @@ import { NotificationProvider } from 'contexts/NotificationContext';
 import useAuth from 'hooks/useAuth';
 import useSettings from 'hooks/useSettings';
 import { topBarHeight } from 'utils/constant';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Span } from '../../../components/Typography';
 import NotificationBar from '../../NotificationBar/NotificationBar';
 import { deepOrange, deepPurple } from '@mui/material/colors';
+import ModalProfile from 'components/ModalProfile';
+import { ConfigRouter } from 'ConfigRouter';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -75,6 +77,8 @@ const getFirstUsername = (username) => {
   return username[0] ?? 'User';
 }
 const Layout1Topbar = () => {
+
+  const [openModalProfile, setOpenModalProfile] = useState(false);
   const theme = useTheme();
   const { settings, updateSettings } = useSettings();
   const { logout, user } = useAuth();
@@ -97,18 +101,26 @@ const Layout1Topbar = () => {
     updateSidebarMode({ mode });
   };
 
+  const onCloseModal = () => {
+    setOpenModalProfile(false);
+  }
+  const onOpenModalProfile = () => {
+    setOpenModalProfile(true);
+  }
+
   return (
-    <TopbarRoot>
-      <TopbarContainer>
-        <Box display="flex">
-          <MultipleSelect />
-          {/* <StyledIconButton onClick={handleSidebarToggle}>
+    <>
+      <TopbarRoot>
+        <TopbarContainer>
+          <Box display="flex">
+            <MultipleSelect />
+            {/* <StyledIconButton onClick={handleSidebarToggle}>
               <Tooltip title="Đóng/mở menu">
                 <Icon>menu</Icon>
               </Tooltip>
           </StyledIconButton> */}
 
-          {/* <IconBox>
+            {/* <IconBox>
             <StyledIconButton>
               <Icon>mail_outline</Icon>
             </StyledIconButton>
@@ -121,48 +133,50 @@ const Layout1Topbar = () => {
               <Icon>star_outline</Icon>
             </StyledIconButton>
           </IconBox> */}
-        </Box>
+          </Box>
 
-        <Box display="flex" alignItems="center">
-          {/* <MatxSearchBox /> */}
+          <Box display="flex" alignItems="center">
+            {/* <MatxSearchBox /> */}
 
-          {/* <NotificationProvider>
+            {/* <NotificationProvider>
             <NotificationBar />
           </NotificationProvider> */}
 
-          <MatxMenu
-            menuButton={
-              <UserMenu>
-                <Hidden xsDown>
-                  <Icon> person </Icon>
-                  <Span><strong>{user.username}</strong>
-                  </Span>
-                </Hidden>
-              </UserMenu>
-            }
-          >
-            <StyledItem>
-              <Link to="/">
+            <MatxMenu
+              menuButton={
+                <UserMenu>
+                  <Hidden xsDown>
+                    <Icon> person </Icon>
+                    <Span><strong>{user.username}</strong>
+                    </Span>
+                  </Hidden>
+                </UserMenu>
+              }
+            >
+              <StyledItem>
+                {/* <Link to="/"> */}
                 <Icon> home</Icon>
                 <Span> Trang chủ </Span>
-              </Link>
-            </StyledItem>
+                {/* </Link> */}
+              </StyledItem>
 
-            <StyledItem>
-              <Link to="/page-layouts/user-profile">
-                <Icon> person </Icon>
-                <Span> Trang cá nhân </Span>
-              </Link>
-            </StyledItem>
+              <StyledItem>
+                <Link to={ConfigRouter.profile}>
+                  <Icon> person </Icon>
+                  <Span> Trang cá nhân </Span>
+                </Link>
+              </StyledItem>
 
-            <StyledItem onClick={logout}>
-              <Icon> power_settings_new </Icon>
-              <Span> Đăng xuất </Span>
-            </StyledItem>
-          </MatxMenu>
-        </Box>
-      </TopbarContainer>
-    </TopbarRoot>
+              <StyledItem onClick={logout}>
+                <Icon> power_settings_new </Icon>
+                <Span> Đăng xuất </Span>
+              </StyledItem>
+            </MatxMenu>
+          </Box>
+        </TopbarContainer>
+        {/* <ModalProfile open={openModalProfile} onCloseModal={onCloseModal} /> */}
+      </TopbarRoot>
+    </>
   );
 };
 

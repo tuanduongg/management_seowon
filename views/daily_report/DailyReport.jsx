@@ -3,7 +3,6 @@ import ModalAddReport from 'components/ModalAddReport';
 import { Fragment, useEffect, useState } from 'react';
 import RowCards from 'views/dashboard/shared/RowCards';
 import { useTranslation } from 'react-i18next';
-import { ConfirmationDialog } from 'components';
 import { ARRYEAR, getPercentNG } from 'components/ModalAddReport/modal_add_report.service';
 import restApi from 'utils/restAPI';
 import { RouteApi } from 'RouteApi';

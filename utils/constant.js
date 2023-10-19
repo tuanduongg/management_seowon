@@ -6,3 +6,4 @@ export const containedLayoutWidth = 1200
 export const ASSET_TOKEN = 'accessToken'
 export const DATA_USER = 'DATA_USER'
 export const ROWPERPAGE = [10, 20];
+export const ROLES = ['VIEWER', 'EDITOR'];

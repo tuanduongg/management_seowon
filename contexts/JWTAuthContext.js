@@ -99,7 +99,6 @@ export const AuthProvider = ({ children }) => {
         if (response?.data?.user) {
 
             const { accessToken, user } = response.data;
-            console.log({ accessToken, user });
 
             setSession(accessToken, user);
 

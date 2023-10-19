@@ -10,6 +10,7 @@ const Time = Loadable(lazy(() => import('views/time')));
 const Department = Loadable(lazy(() => import('views/department')));
 const Stage = Loadable(lazy(() => import('views/stage')));
 const Account = Loadable(lazy(() => import('views/account')));
+const Profile = Loadable(lazy(() => import('views/profile')));
 
 const dashboardRoutes = [
     { path: ConfigRouter.home, element: <DailyReport />, auth: authRoles.admin },
@@ -18,6 +19,7 @@ const dashboardRoutes = [
     { path: ConfigRouter.department, element: <Department />, auth: authRoles.admin },
     { path: ConfigRouter.stage, element: <Stage />, auth: authRoles.admin },
     { path: ConfigRouter.user, element: <Account />, auth: authRoles.admin },
+    { path: ConfigRouter.profile, element: <Profile />, auth: authRoles.admin },
 ];
 
 export default dashboardRoutes;

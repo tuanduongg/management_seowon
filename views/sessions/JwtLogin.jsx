@@ -81,7 +81,15 @@ const JwtLogin = () => {
     setLoading(true);
     try {
       const data = await login(values.username, values.password);
-      navigate(ConfigRouter.home);
+      if (data) {
+
+        navigate(ConfigRouter.home);
+        return;
+      }
+      setMessageErr('Invalid Username or Password!');
+      setLoading(false);
+
+
     } catch (e) {
       setMessageErr('Invalid Username or Password!');
       setLoading(false);
@@ -94,15 +102,15 @@ const JwtLogin = () => {
 
     <JWTRoot>
       <Card className="card">
-        <Grid container>
-          <Grid item sm={6} xs={12}>
+        <Grid container sx={{ display: 'block' }}>
+          <Grid item sm={12} xs={12}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
               <img src={Logo} width="100%" alt="logo" />
               <Typography component={'h4'} variant={'h4'}>Seowonintech</Typography>
             </JustifyBox>
           </Grid>
 
-          <Grid item sm={6} xs={12}>
+          <Grid item sm={12} xs={12}>
             <ContentBox>
               <Formik
                 onSubmit={handleFormSubmit}

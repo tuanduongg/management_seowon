@@ -21,8 +21,9 @@ export const navigations = [
   //   children: [
   //     { name: 'user', path: ConfigRouter.user, icon: 'person' },
   //   ],
+
   // },
-  { name: 'Quản lý tài khoản', path: ConfigRouter.user, icon: 'person' },
+  { name: 'Quản lý tài khoản', path: ConfigRouter.user, icon: 'switch_account' },
   // { label: 'Components', type: 'label' },
   // {
   //   name: 'Components',
@@ -50,11 +51,12 @@ export const navigations = [
   //   icon: 'trending_up',
   //   children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
   // },
-  { label: 'PAGES', type: 'label' },
-  {
-    name: 'Documentation',
-    icon: 'launch',
-    type: 'extLink',
-    path: 'http://demos.ui-lib.com/matx-react-doc/',
-  },
+  { label: 'Profile', type: 'label' },
+  { name: 'Profile', path: ConfigRouter.profile, icon: 'account_circle' },
+  // {
+  //   name: 'Profile',
+  //   icon: 'launch',
+  //   type: 'extLink',
+  //   path: 'http://demos.ui-lib.com/matx-react-doc/',
+  // },
 ];

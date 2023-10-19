@@ -31,8 +31,9 @@ export const RouteApi = {
     deleteStage: 'stage/delete',
     updateStage: 'stage/update',
 
-    addUser: 'user/add',
+    addUser: 'user/create',
     getUser: 'user/all',
     deleteUser: 'user/delete',
     updateUser: 'user/update',
+    changePasswordUser: 'user/change-password',
 };
