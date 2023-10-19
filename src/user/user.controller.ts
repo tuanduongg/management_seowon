@@ -22,7 +22,7 @@ export class UserController {
     const user = await this.userService.createUser(body, request);
     if (user) {
       user.password = '';
-      return res.status(HttpStatus.CREATED).send(user);
+      return res.status(HttpStatus.OK).send(user);
     }
     return res
       .status(HttpStatus.BAD_REQUEST)
@@ -48,5 +48,15 @@ export class UserController {
   async delete(@Body() body, @Res() res: Response, @Req() request: Request) {
     const users = await this.userService.delete(body, request);
     return res.status(HttpStatus.OK).send(users);
+  }
+  @UseGuards(AuthGuard)
+  @Post('/change-password')
+  async changePassword(@Body() body, @Res() res: Response, @Req() request: Request) {
+    const user = await this.userService.changePassword(body, request);
+    if(user) {
+      return res.status(HttpStatus.OK).send(user);
+    }
+    return res.status(HttpStatus.BAD_REQUEST).send({message:'Invalid current password!'});
+    
   }
 }

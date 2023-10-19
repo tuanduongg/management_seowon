@@ -7,6 +7,7 @@ import {
   Repository,
   EntityManager,
 } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -18,14 +19,21 @@ export class UserService {
 
   async createUser(body, request): Promise<User> {
     const { username, password, role, department } = body;
-    const user = new User();
-    user.username = username;
-    user.password = password;
-    user.role = role;
-    user.department_id = department;
-    user.created_by = request?.user?.username;
-    const newUser = this.userRepository.create(user);
-    return await this.userRepository.save(newUser);
+    const userExists = await this.userRepository.findOne({
+      where: { username },
+    });
+    console.log('userExists', userExists);
+    if (!userExists) {
+      const user = new User();
+      user.username = username;
+      user.password = password;
+      user.role = role;
+      user.department_id = department;
+      user.created_by = request?.user?.username;
+      const newUser = this.userRepository.create(user);
+      return await this.userRepository.save(newUser);
+    }
+    return null;
   }
   async getAll(body) {
     const page = body.page || 0;
@@ -56,14 +64,19 @@ export class UserService {
     // return { users, total };
   }
   async update(body, request) {
-    const { id, username, role, department } = body;
-    return await this.userRepository.save({
+    const { username, password, role, department, id } = body;
+    const obj = {
       user_id: id,
       username,
       role,
       department_id: department,
+
       updated_by: request?.user?.username,
-    });
+    };
+    if (password?.trim().length > 0) {
+      obj['password'] = await bcrypt.hash(password, 10);
+    }
+    return await this.userRepository.save(obj);
   }
   async delete(body, request) {
     const { id } = body;
@@ -82,5 +95,26 @@ export class UserService {
     };
     const user = await this.userRepository.findOne(findOptions);
     return user;
+  }
+  async changePassword(body, request) {
+    const { currentPassword, newPassword, id } = body;
+    const user = await this.userRepository.findOne({ where: { user_id: id } });
+    if (user) {
+      const checkPass = await bcrypt.compare(currentPassword, user.password);
+      if (checkPass) {
+        return await this.userRepository.save({
+          user_id: id,
+          password: await bcrypt.hash(newPassword, 10),
+          updated_by: request?.user?.username,
+        });
+      }
+    }
+
+    // else {
+    //   if (id) {
+    //
+    //   }
+    // }
+    return null;
   }
 }
