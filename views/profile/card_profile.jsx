@@ -1,5 +1,6 @@
 import { Box, Button, Card, CardActions, CardContent, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ROLES } from "utils/constant";
 
 const CardProfile = ({ dataUser, departments }) => {
@@ -8,6 +9,8 @@ const CardProfile = ({ dataUser, departments }) => {
     const [role, setRole] = useState('');
     const [department, setDepartment] = useState('');
     const [listRole, setListRole] = useState([...ROLES, 'ADMIN']);
+    const { t, i18n } = useTranslation();
+
 
     useEffect(() => {
         if (dataUser) {
@@ -31,7 +34,7 @@ const CardProfile = ({ dataUser, departments }) => {
         <Card sx={{ minWidth: 275, border: '1px solid #ddd', height: '100%' }}>
             <Box sx={{ width: '100%', height: '40px' }}>
                 <Typography component={'h5'} sx={{ marginLeft: '20px', marginTop: '20px' }} variant="h5">
-                    Personal information
+                    {t('per-info')}
                 </Typography>
             </Box>
             <CardContent>

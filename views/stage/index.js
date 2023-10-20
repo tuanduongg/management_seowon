@@ -12,6 +12,7 @@ import ModalAddStage from 'components/ModalAddStage';
 import { ROWPERPAGE } from 'utils/constant';
 import SearchIcon from '@mui/icons-material/Search';
 import { showDateTimeFromDB } from 'utils/utils';
+import NoData from 'components/NoData';
 
 
 
@@ -142,13 +143,13 @@ const Stage = () => {
 
     const handleClickDelete = () => {
         ShowQuestion({
-            content: 'Bạn chắc chắn muốn xóa ?',
+            content: 'text-delete',
             icon: 'warning',
             onClickYes: async () => {
                 const response = await restApi.post(RouteApi.deleteStage, { id: selected?.stage_id });
                 if (response?.status === 200) {
                     ShowAlert({
-                        textProp: 'Xóa thành công!',
+                        textProp: 'success-text',
                         onClose: () => {
                             getData();
                         }
@@ -172,7 +173,7 @@ const Stage = () => {
 
     if (loading) return <Loading />;
     return (<><Grid container spacing={3}>
-        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Stage</Typography >
+        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>{t('stage')}</Typography >
         <Grid sx={{ display: 'flex', justifyContent: 'space-between' }} item lg={12} md={12} sm={12} xs={12}>
             <Box>
                 <FormControl size='small' sx={{}} variant="outlined">
@@ -181,7 +182,7 @@ const Stage = () => {
                         value={search}
                         onKeyDown={handleKeyDown}
                         onChange={onChangeSearch}
-                        placeholder='Search by name or code...'
+                        placeholder='Search by name...'
                         id="search"
                         type={'text'}
                         endAdornment={
@@ -218,6 +219,9 @@ const Stage = () => {
                                 <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
                         </TableRow>
                     </TableHead>
+                    {dataList?.length > 0 ? (<TableBody>
+
+                    </TableBody>) : (<NoData />)}
                     {dataList?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.stage_id === selected?.stage_id} sx={{ cursor: 'pointer' }}>
                         <StyledTableCell align='center'>
                             {index + 1 + (page * rowPerpage)}

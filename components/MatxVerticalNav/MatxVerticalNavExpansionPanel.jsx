@@ -2,6 +2,7 @@ import { ButtonBase, Icon } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 const NavExpandRoot = styled('div')(({ theme }) => ({
@@ -80,6 +81,8 @@ const MatxVerticalNavExpansionPanel = ({ item, children, mode }) => {
   const componentHeight = useRef(0);
   const { pathname } = useLocation();
   const { name, icon, iconText, badge } = item;
+  const { t, i18n } = useTranslation();
+
 
   const handleClick = () => {
     componentHeight.current = 0;
@@ -112,6 +115,9 @@ const MatxVerticalNavExpansionPanel = ({ item, children, mode }) => {
     }
   }, [pathname, calcaulateHeight]);
 
+  console.log('name', name);
+  console.log('t(name)', t(name));
+
   return (
     <NavExpandRoot>
       <BaseButton
@@ -125,7 +131,7 @@ const MatxVerticalNavExpansionPanel = ({ item, children, mode }) => {
         <Box display="flex" alignItems="center">
           {icon && <Icon className="icon">{icon}</Icon>}
           {iconText && <BulletIcon />}
-          <ItemText className="sidenavHoverShow">{name}</ItemText>
+          <ItemText className="sidenavHoverShow">{t(name)}</ItemText>
         </Box>
 
         {badge && <BadgeValue className="sidenavHoverShow itemIcon">{badge.value}</BadgeValue>}

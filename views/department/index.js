@@ -120,13 +120,13 @@ const Department = () => {
 
     const handleClickDelete = () => {
         ShowQuestion({
-            content: 'Bạn chắc chắn muốn xóa ?',
+            content: 'text-delete',
             icon: 'warning',
             onClickYes: async () => {
                 const response = await restApi.post(RouteApi.deleteDepart, { id: selected?.department_id });
                 if (response?.status === 200) {
                     ShowAlert({
-                        textProp: 'Xóa thành công!',
+                        textProp: 'success-text',
                         onClose: () => {
                             getData();
                         }
@@ -143,7 +143,7 @@ const Department = () => {
 
     if (loading) return <Loading />;
     return (<><Grid container spacing={3}>
-        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Model</Typography >
+        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>{t('department')}</Typography >
 
         <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }} item lg={12} md={12} sm={12} xs={12}>
             <Box sx={{ display: 'flex' }}>

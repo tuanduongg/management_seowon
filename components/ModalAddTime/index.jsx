@@ -79,7 +79,7 @@ const ModalAddTime = ({ open, onCloseModal, afterSave, rowSelect, typeModal }) =
         if (response?.status === 200) {
             ShowAlert({
                 iconProp: 'success',
-                textProp: typeModal === 'ADD' ? 'Thêm mới thông tin thành công !' : 'Lưu thông tin thành công!',
+                textProp: typeModal === 'ADD' ? 'add-success-text' : 'save-success-text',
                 onClose: () => {
                     afterSave();
                 }

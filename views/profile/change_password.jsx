@@ -10,6 +10,7 @@ import { ShowAlert } from "utils/confirm";
 import useAuth from "hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { ConfigRouter } from "ConfigRouter";
+import { useTranslation } from "react-i18next";
 
 const initValidate = { err: false, msg: '' };
 
@@ -29,6 +30,9 @@ const ChangePassword = ({ dataUser, departments }) => {
     const [listRole, setListRole] = useState([...ROLES, 'ADMIN']);
     const { logout, user } = useAuth();
     const navigate = useNavigate();
+
+    const { t, i18n } = useTranslation();
+
     // useEffect(() => {
     //     if (dataUser) {
     //         const {
@@ -100,7 +104,7 @@ const ChangePassword = ({ dataUser, departments }) => {
         if (response?.status === 200) {
 
             ShowAlert({
-                titleProp: 'Thông báo', textProp: 'Password changed successful!', onClose: () => {
+                titleProp: 'notification', textProp: 'Password changed successful!', onClose: () => {
                     logout();
                     navigate(ConfigRouter.login);
                 }
@@ -115,7 +119,7 @@ const ChangePassword = ({ dataUser, departments }) => {
         <Card sx={{ minWidth: 275, border: '1px solid #ddd', height: '100%' }}>
             <Box sx={{ width: '100%', height: '40px' }}>
                 <Typography component={'h5'} sx={{ marginLeft: '20px', marginTop: '20px' }} variant="h5">
-                    Change password
+                    {t('change-pw')}
                 </Typography>
             </Box>
             <CardContent>

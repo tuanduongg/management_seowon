@@ -13,6 +13,7 @@ import { ROWPERPAGE } from 'utils/constant';
 import SearchIcon from '@mui/icons-material/Search';
 import { showDateTimeFromDB } from 'utils/utils';
 import ModalAccount from 'components/ModalAccount';
+import NoData from 'components/NoData';
 
 
 
@@ -84,6 +85,7 @@ const Account = () => {
     const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
 
 
+
     const onCloseModal = () => {
         setSelected(null);
         setRowEdit(null);
@@ -148,13 +150,13 @@ const Account = () => {
 
     const handleClickDelete = () => {
         ShowQuestion({
-            content: 'Bạn chắc chắn muốn xóa ?',
+            content: 'text-delete',
             icon: 'warning',
             onClickYes: async () => {
                 const response = await restApi.post(RouteApi.deleteUser, { id: selected?.user_id });
                 if (response?.status === 200) {
                     ShowAlert({
-                        textProp: 'Xóa thành công!',
+                        textProp: 'success-text',
                         onClose: () => {
                             getData();
                         }
@@ -178,7 +180,7 @@ const Account = () => {
 
     if (loading) return <Loading />;
     return (<><Grid container spacing={3}>
-        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>Account</Typography >
+        <Typography component={'h5'} sx={{ marginLeft: '20px' }} variant='h5'>{t('account')}</Typography >
         <Grid sx={{ display: 'flex', justifyContent: 'space-between' }} item lg={12} md={12} sm={12} xs={12}>
             <Box>
                 <FormControl size='small' sx={{}} variant="outlined">
@@ -187,7 +189,7 @@ const Account = () => {
                         value={search}
                         onKeyDown={handleKeyDown}
                         onChange={onChangeSearch}
-                        placeholder='Search by name or code...'
+                        placeholder='Search by username...'
                         id="search"
                         type={'text'}
                         endAdornment={
@@ -224,23 +226,26 @@ const Account = () => {
                                 <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
                         </TableRow>
                     </TableHead>
-                    {dataList?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.user_id === selected?.user_id} sx={{ cursor: 'pointer' }}>
-                        <StyledTableCell align='center'>
-                            {index + 1 + (page * rowPerpage)}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.username}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.department_name}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.role}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {showDateTimeFromDB(item?.updated_at)}
-                        </StyledTableCell>
-                    </StyledTableRow>))}
+                    {dataList?.length > 0 ? (<TableBody>
+
+                        {dataList?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.user_id === selected?.user_id} sx={{ cursor: 'pointer' }}>
+                            <StyledTableCell align='center'>
+                                {index + 1 + (page * rowPerpage)}
+                            </StyledTableCell>
+                            <StyledTableCell align='center'>
+                                {item?.username}
+                            </StyledTableCell>
+                            <StyledTableCell align='center'>
+                                {item?.department_name}
+                            </StyledTableCell>
+                            <StyledTableCell align='center'>
+                                {item?.role}
+                            </StyledTableCell>
+                            <StyledTableCell align='center'>
+                                {showDateTimeFromDB(item?.updated_at)}
+                            </StyledTableCell>
+                        </StyledTableRow>))}
+                    </TableBody>) : (<NoData />)}
                 </Table>
             </TableContainer>
             {dataList?.length > 0 && (<TablePagination

@@ -1,9 +1,13 @@
-import Swal from "sweetalert2"
+import Swal from "sweetalert2";
+import { t } from "i18next";
+
+
+
 const width = '300px';
-export const ShowQuestion = ({ titleProp = 'Thông báo', content = '', icon = 'info', showCancelButton = true, onClickYes = () => { }, onClickNo = () => { } }) => {
+export const ShowQuestion = ({ titleProp = 'notification', content = '', icon = 'info', showCancelButton = true, onClickYes = () => { }, onClickNo = () => { } }) => {
     return Swal.fire({
-        title: titleProp,
-        text: content,
+        title: t(titleProp),
+        text: t(content),
         icon: icon,
         showCancelButton: showCancelButton,
         cancelButtonText: 'No',
@@ -21,11 +25,11 @@ export const ShowQuestion = ({ titleProp = 'Thông báo', content = '', icon = '
     })
 }
 
-export const ShowAlert = ({ iconProp = 'success', titleProp = 'Thông báo', textProp, confirmButtonText = 'Đóng', onClose = () => { } }) => {
+export const ShowAlert = ({ iconProp = 'success', titleProp = 'notification', textProp, confirmButtonText = 'close', onClose = () => { } }) => {
     return Swal.fire(
         {
-            title: titleProp,
-            text: textProp,
+            title: t(titleProp),
+            text: t(textProp),
             icon: iconProp,
             allowOutsideClick: false,
             width: width,

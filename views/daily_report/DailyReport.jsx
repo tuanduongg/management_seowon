@@ -166,7 +166,6 @@ const DailyReport = () => {
     const [openModalAdd, setOpenModalAdd] = useState(false);
     const theme = useTheme();
     const [rowSelected, setRowSelected] = useState('');
-    const { t, i18n } = useTranslation();
     const [page, setPage] = useState(0);
     const [rowPerpage, setRowPerpage] = useState(ROWPERPAGE[0]);
     const [listWork, setListWork] = useState([]);
@@ -183,6 +182,8 @@ const DailyReport = () => {
     const [listDepartment, setListDepartment] = useState([]);
     const [listModel, setListModel] = useState([]);
     const [total, setTotal] = useState(0);
+    const { t, i18n } = useTranslation();
+
 
 
     const handleClickAdd = () => {
@@ -263,13 +264,13 @@ const DailyReport = () => {
     const handleClickDelete = () => {
         if (rowSelected) {
             ShowQuestion({
-                content: 'Bạn chắc chắn muốn xóa ?',
+                content: 'text-delete',
                 icon: 'warning',
                 onClickYes: async () => {
                     const response = await restApi.post(RouteApi.deleteWork, { id: rowSelected?.work_id });
                     if (response?.status === 200) {
                         ShowAlert({
-                            textProp: 'Xóa thành công!',
+                            textProp: 'success-text',
                             onClose: getData
                         });
                     } else {
@@ -454,7 +455,7 @@ const DailyReport = () => {
             </Grid>
 
             <Grid item lg={12} md={12} sm={12} xs={12}>
-                <H4>Báo cáo hằng ngày</H4>
+                <H4>{t('daily-report')}</H4>
                 <TableContainer sx={{ backgroundColor: '#e3e3e3ed' }}>
                     <Table stickyHeader aria-label="customized table">
                         <TableHead>

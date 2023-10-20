@@ -13,6 +13,8 @@ import NotificationBar from '../../NotificationBar/NotificationBar';
 import { deepOrange, deepPurple } from '@mui/material/colors';
 import ModalProfile from 'components/ModalProfile';
 import { ConfigRouter } from 'ConfigRouter';
+import { ShowAlert, ShowQuestion } from 'utils/confirm';
+import { useTranslation } from 'react-i18next';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -83,6 +85,8 @@ const Layout1Topbar = () => {
   const { settings, updateSettings } = useSettings();
   const { logout, user } = useAuth();
   const isMdScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { t, i18n } = useTranslation();
+
 
   const updateSidebarMode = (sidebarSettings) => {
     updateSettings({
@@ -106,6 +110,10 @@ const Layout1Topbar = () => {
   }
   const onOpenModalProfile = () => {
     setOpenModalProfile(true);
+  }
+
+  const hanldeClickLogout = () => {
+    ShowQuestion({ titleProp: 'Thông báo', content: 'Bạn chắc chắn muốn đăng xuất ?', showCancelButton: true, onClickYes: logout });
   }
 
   return (
@@ -136,11 +144,6 @@ const Layout1Topbar = () => {
           </Box>
 
           <Box display="flex" alignItems="center">
-            {/* <MatxSearchBox /> */}
-
-            {/* <NotificationProvider>
-            <NotificationBar />
-          </NotificationProvider> */}
 
             <MatxMenu
               menuButton={
@@ -154,22 +157,22 @@ const Layout1Topbar = () => {
               }
             >
               <StyledItem>
-                {/* <Link to="/"> */}
-                <Icon> home</Icon>
-                <Span> Trang chủ </Span>
-                {/* </Link> */}
+                <Link to={ConfigRouter.home}>
+                  <Icon> home</Icon>
+                  <Span> {t('home')} </Span>
+                </Link>
               </StyledItem>
 
               <StyledItem>
                 <Link to={ConfigRouter.profile}>
                   <Icon> person </Icon>
-                  <Span> Trang cá nhân </Span>
+                  <Span> {t('profile')} </Span>
                 </Link>
               </StyledItem>
 
-              <StyledItem onClick={logout}>
+              <StyledItem onClick={hanldeClickLogout}>
                 <Icon> power_settings_new </Icon>
-                <Span> Đăng xuất </Span>
+                <Span>{t('logout')} </Span>
               </StyledItem>
             </MatxMenu>
           </Box>

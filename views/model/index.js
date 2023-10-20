@@ -155,13 +155,13 @@ const Model = () => {
 
     const handleClickDelete = () => {
         ShowQuestion({
-            content: 'Bạn chắc chắn muốn xóa ?',
+            content: 'text-delete',
             icon: 'warning',
             onClickYes: async () => {
                 const response = await restApi.post(RouteApi.deleteModel, { id: selected?.model_id });
                 if (response?.status === 200) {
                     ShowAlert({
-                        textProp: 'Xóa thành công!',
+                        textProp: 'success-text',
                         onClose: () => {
                             getModels();
                         }
@@ -232,24 +232,27 @@ const Model = () => {
                                 <StyledTableCell key={index} width={item?.with} align={item?.align}>{item?.title}</StyledTableCell>))}
                         </TableRow>
                     </TableHead>
-                    {models?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.model_id === selected?.model_id} sx={{ cursor: 'pointer' }}>
-                        <StyledTableCell align='center'>
-                            {index + (page * rowPerpage) + 1}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.model_name}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.model_code}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.color}
-                        </StyledTableCell>
-                        <StyledTableCell align='center'>
-                            {item?.created_by}
-                        </StyledTableCell>
-                    </StyledTableRow>))}
+                    {models?.length > 0 ? (
+                        <TableBody>
+                            {models?.map((item, index) => (<StyledTableRow hover onClick={() => { handleClickRow(item) }} selected={item?.model_id === selected?.model_id} sx={{ cursor: 'pointer' }}>
+                                <StyledTableCell align='center'>
+                                    {index + (page * rowPerpage) + 1}
+                                </StyledTableCell>
+                                <StyledTableCell align='center'>
+                                    {item?.model_name}
+                                </StyledTableCell>
+                                <StyledTableCell align='center'>
+                                    {item?.model_code}
+                                </StyledTableCell>
+                                <StyledTableCell align='center'>
+                                    {item?.color}
+                                </StyledTableCell>
+                                <StyledTableCell align='center'>
+                                    {item?.created_by}
+                                </StyledTableCell>
+                            </StyledTableRow>))}
 
+                        </TableBody>) : (<NoData />)}
                 </Table>
             </TableContainer>
             {models?.length > 0 && (<TablePagination

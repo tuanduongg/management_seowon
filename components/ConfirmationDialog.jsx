@@ -51,7 +51,7 @@ const ConfirmationDialog = ({
   open,
   onConfirmDialogClose,
   text,
-  title = 'Thông báo',
+  title = 'notification',
   onYesClick,
 }) => {
   return (

@@ -4,7 +4,7 @@ export const navigations = [
   { label: 'goods', type: 'label' },
 
   {
-    name: 'Quản lý hàng hóa',
+    name: 'management_goods',
     icon: 'assessment',
     children: [
       { name: 'sidebar-report', path: ConfigRouter.home, icon: 'assessment' },
@@ -14,7 +14,7 @@ export const navigations = [
       { name: 'stage', icon: 'checklistrtl', path: ConfigRouter.stage },
     ],
   },
-  { label: 'user', type: 'label' },
+  { label: 'account', type: 'label' },
   // {
   //   name: 'Quản lý người dùng',
   //   icon: 'group',
@@ -23,7 +23,7 @@ export const navigations = [
   //   ],
 
   // },
-  { name: 'Quản lý tài khoản', path: ConfigRouter.user, icon: 'switch_account' },
+  { name: 'account', path: ConfigRouter.user, icon: 'switch_account' },
   // { label: 'Components', type: 'label' },
   // {
   //   name: 'Components',
@@ -51,8 +51,8 @@ export const navigations = [
   //   icon: 'trending_up',
   //   children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
   // },
-  { label: 'Profile', type: 'label' },
-  { name: 'Profile', path: ConfigRouter.profile, icon: 'account_circle' },
+  { label: 'profile', type: 'label' },
+  { name: 'profile', path: ConfigRouter.profile, icon: 'account_circle' },
   // {
   //   name: 'Profile',
   //   icon: 'launch',

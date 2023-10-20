@@ -109,13 +109,13 @@ const Time = () => {
 
     const handleClickDelete = () => {
         ShowQuestion({
-            content: 'Bạn chắc chắn muốn xóa ?',
+            content: 'text-delete',
             icon: 'warning',
             onClickYes: async () => {
                 const response = await restApi.post(RouteApi.deleteTime, { id: selected?.time_id });
                 if (response?.status === 200) {
                     ShowAlert({
-                        textProp: 'Xóa thành công!',
+                        textProp: 'success-text',
                         onClose: () => {
                             getData();
                         }

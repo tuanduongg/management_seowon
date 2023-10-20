@@ -647,6 +647,10 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
     }
 
 
+    const handleClickUpload = () => {
+        alert('upload');
+    }
+
 
     return (<>
         <CustomModal
@@ -1067,8 +1071,22 @@ const ModalAddReport = ({ open, handleClose, afterSaved, dataMaster, typeModal, 
                     </Box>
                 </Box>
                 <Typography variant="p" component={'p'} sx={{ marginTop: '20px' }} fontWeight={'bold'}>Ghi chú</Typography>
-                <Grid sx={{ margin: '10px 0px', width: '100%', height: '200px' }} spacing={1} container>
-                    <QuillEditor readOnly={typeModal === 'VIEW'} data={note} showToolbar={typeModal !== 'VIEW'} setData={setNote} />
+                <Grid sx={{ margin: '10px 0px', width: '100%', height: 'auto' }} spacing={1} container>
+                    <TextField
+                        fullWidth
+                        id="standard-multiline-flexible"
+                        label=""
+                        multiline
+                        rows={2}
+                    />
+                    {/* <QuillEditor readOnly={typeModal === 'VIEW'} data={note} showToolbar={typeModal !== 'VIEW'} setData={setNote} /> */}
+                </Grid>
+                <Typography variant="p" component={'p'} sx={{ marginTop: '20px' }} fontWeight={'bold'}>Upload ảnh(nếu có)</Typography>
+                <Grid sx={{ margin: '10px 0px', width: '100%' }} spacing={1} container>
+                    <Button startIcon={<SaveIcon />} variant="outlined" autoFocus onClick={handleClickUpload}>
+                        upload
+                    </Button>
+                    {/* <QuillEditor readOnly={typeModal === 'VIEW'} data={note} showToolbar={typeModal !== 'VIEW'} setData={setNote} /> */}
                 </Grid>
             </Box>
             {/* </DialogContent> */}
